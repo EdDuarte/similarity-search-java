@@ -1,5 +1,7 @@
 # Near Neighbor Search
 
+[![Build Status](https://travis-ci.org/edduarte/near-neighbor-search.svg?branch=master)](https://travis-ci.org/edduarte/near-neighbor-search)
+
 Near Neighbor Search algorithms (as specified in "Mining of Massive Datasets", Cambridge University Press, Rajaraman, A., & Ullman, J. D.) implemented in Java. A similarity coefficient can be determined between two strings or two sets of numbers (any Collection that contains inheritors of java.lang.Number). This coefficient is a value between 0 and 1, where 0 means the two strings / sets are disjoint and 1 means they are equal.
 
 ## Usage
