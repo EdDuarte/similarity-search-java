@@ -204,7 +204,7 @@ int[] setBands = exec.submit(c.apply(setSignature)).get();
 // store the bands
 // ...
 
-// at a later date, determine if there are candidate pairs
+// at a later date, determine if there are any candidate pairs
 boolean isCandidatePair = LSHSimilarity.isCandidatePair(stringBands, otherStringBands);
 
 ```
