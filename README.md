@@ -47,7 +47,7 @@ double similarity = Similarity.jaccard()
 
 #### Jaccard
 
-Aside from the shingle length, you can other optional parameters:
+Aside from the shingle length, you can use other optional parameters:
 
 ```java
 // optional parameters
@@ -161,7 +161,7 @@ This will return the Jaccard similarity coefficient for strings / sets that are 
 
 #### Internal classes
 
-So far the code samples use the fluent interface available in the Similarity class. However, you can instantiate a number of classes that correspond to the individual steps of the implemented near-neighbor search algorithms, and use them in your platform at your own accord.
+So far the code samples have shown how to use the fluent interface available in the Similarity class. However, you can instantiate a number of classes that correspond to each step of the implemented near-neighbor search algorithms, and use them in your platform at your own accord.
 
 ```java
 
