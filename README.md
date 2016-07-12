@@ -219,7 +219,7 @@ You can see this library in use at https://github.com/vokter/vokter.
 
 # License
 
-    Copyright 2015 Eduardo Duarte
+    Copyright 2016 Eduardo Duarte
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
