@@ -1,11 +1,12 @@
 package com.edduarte.similarity;
 
 /**
- * @author Eduardo Duarte (<a href="mailto:hello@edduarte.com">hello@edduarte.com</a>)
- * @version 1.0.0
- * @since 1.0.0
+ * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
+ * @version 0.0.1
+ * @since 0.0.1
  */
-public interface StringSimilarity {
+public interface StringSimilarity extends Similarity<String> {
 
-    double stringSimilarity(String s1, String s2);
+    @Override
+    double calculate(String t1, String t2);
 }

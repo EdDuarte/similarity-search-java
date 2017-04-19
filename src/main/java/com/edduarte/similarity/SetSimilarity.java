@@ -3,12 +3,13 @@ package com.edduarte.similarity;
 import java.util.Collection;
 
 /**
- * @author Eduardo Duarte (<a href="mailto:hello@edduarte.com">hello@edduarte.com</a>)
- * @version 1.0.0
- * @since 1.0.0
+ * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
+ * @version 0.0.1
+ * @since 0.0.1
  */
-public interface SetSimilarity {
+public interface SetSimilarity extends Similarity<Collection<? extends Number>> {
 
-    double setSimilarity(Collection<? extends Number> c1,
-                         Collection<? extends Number> c2);
+    @Override
+    double calculate(Collection<? extends Number> t1,
+                     Collection<? extends Number> t2);
 }

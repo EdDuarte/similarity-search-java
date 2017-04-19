@@ -1,4 +1,4 @@
-package com.edduarte.hash;
+package com.edduarte.similarity.hash;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -47,7 +47,7 @@ public class HashProvider {
     /**
      * @param value the value to be hashed
      * @param m     integer output range [1,size]
-     * @param k     number stringSimilarity hashes to be computed
+     * @param k     number of hashes to be computed
      * @return array with <i>hashes</i> integer hash positions in the range <i>[0,size)</i>
      */
     public static int[] hashCarterWegman(byte[] value, int m, int k) {
@@ -72,7 +72,7 @@ public class HashProvider {
     /**
      * @param value the value to be hashed
      * @param m     integer output range [1,size]
-     * @param k     number stringSimilarity hashes to be computed
+     * @param k     number of hashes to be computed
      * @return array with <i>hashes</i> integer hash positions in the range <i>[0,size)</i>
      */
     public static int[] hashRNG(byte[] value, int m, int k) {
@@ -88,7 +88,7 @@ public class HashProvider {
     /**
      * @param value the value to be hashed
      * @param m     integer output range [1,size]
-     * @param k     number stringSimilarity hashes to be computed
+     * @param k     number of hashes to be computed
      * @return array with <i>hashes</i> integer hash positions in the range <i>[0,size)</i>
      */
     public static int[] hashCRC(byte[] value, int m, int k) {
@@ -99,7 +99,7 @@ public class HashProvider {
     /**
      * @param value the value to be hashed
      * @param m     integer output range [1,size]
-     * @param k     number stringSimilarity hashes to be computed
+     * @param k     number of hashes to be computed
      * @return array with <i>hashes</i> integer hash positions in the range <i>[0,size)</i>
      */
     public static int[] hashAdler(byte[] value, int m, int k) {
@@ -114,7 +114,7 @@ public class HashProvider {
         while (hashes < k) {
             cs.reset();
             cs.update(value, 0, value.length);
-            // Modify the data to be checksummed by adding the number stringSimilarity already
+            // Modify the data to be checksummed by adding the number of already
             // calculated hashes, the loop counter and
             // a static seed
             cs.update(hashes + salt++ + seed32);
@@ -130,7 +130,7 @@ public class HashProvider {
     /**
      * @param value the value to be hashed
      * @param m     integer output range [1,size]
-     * @param k     number stringSimilarity hashes to be computed
+     * @param k     number of hashes to be computed
      * @return array with <i>hashes</i> integer hash positions in the range <i>[0,size)</i>
      */
     public static int[] hashSimpleLCG(byte[] value, int m, int k) {
@@ -351,7 +351,7 @@ public class HashProvider {
     /**
      * @param value  the value to be hashed
      * @param m      integer output range [1,size]
-     * @param k      number stringSimilarity hashes to be computed
+     * @param k      number of hashes to be computed
      * @param method the hash method name used by {@link MessageDigest#getInstance(String)}
      * @return array with <i>hashes</i> integer hash positions in the range <i>[0,size)</i>
      */
@@ -380,11 +380,11 @@ public class HashProvider {
             BitSet hashed = BitSet.valueOf(digest);
 
             // Convert the hash to numbers in the range [0,size)
-            // Size stringSimilarity the BloomFilter rounded to the next power stringSimilarity two
+            // Size of the BloomFilter rounded to the next power of two
             int filterSize = 32 - Integer.numberOfLeadingZeros(m);
             // Computed hash bits
             int hashBits = digest.length * 8;
-            // Split the hash value according to the size stringSimilarity the Bloomfilter --> higher performance than just doing modulo
+            // Split the hash value according to the size of the Bloomfilter --> higher performance than just doing modulo
             for (int split = 0; split < (hashBits / filterSize)
                     && computedHashes < k; split++) {
                 int from = split * filterSize;
@@ -406,7 +406,7 @@ public class HashProvider {
 
 
     /**
-     * Different types stringSimilarity hash functions that can be used.
+     * Different types of hash functions that can be used.
      */
     public static enum HashMethod {
         /**
@@ -417,7 +417,7 @@ public class HashProvider {
         RNG(HashProvider::hashRNG),
         /**
          * Generates hash values using the Carter Wegman function (<a href="http://en.wikipedia.org/wiki/Universal_hashing">Wikipedia</a>),
-         * which is a universal hashing function. It thus has optimal guarantees for the uniformity stringSimilarity generated hash
+         * which is a universal hashing function. It thus has optimal guarantees for the uniformity of generated hash
          * values. On the downside, the performance is not optimal, as arithmetic operations on large numbers have to be
          * performed.
          */
@@ -429,20 +429,20 @@ public class HashProvider {
         CRC32(HashProvider::hashCRC),
         /**
          * Generates hash values using the Adler32 Checksum algorithm. Adler32 is comparable to CRC32 but is faster at
-         * the cost stringSimilarity a less uniform distribution stringSimilarity hash values.
+         * the cost of a less uniform distribution of hash values.
          */
         Adler32(HashProvider::hashAdler),
         /**
          * Generates hash values using the Murmur 2 hash, see: https://code.google.com/p/smhasher/wiki/MurmurHash2
          * <p>
-         * Murmur 2 is very fast. However, there is a flaw that affects the uniformity stringSimilarity some input values (for
+         * Murmur 2 is very fast. However, there is a flaw that affects the uniformity of some input values (for
          * instance increasing integers as strings).
          */
         Murmur2(HashProvider::hashMurmur2),
         /**
          * Generates hash values using the Murmur 3 hash, see: https://code.google.com/p/smhasher/wiki/MurmurHash3
          * <p>
-         * Its uniformity is comparable to that stringSimilarity cryptographic hash functions but considerably faster.
+         * Its uniformity is comparable to that of cryptographic hash functions but considerably faster.
          */
         Murmur3(HashProvider::hashMurmur3),
         /**
@@ -457,7 +457,7 @@ public class HashProvider {
          * Uses the Fowler–Noll–Vo (FNV) hash function to generate a hash values. It is superior to the standard
          * implementation in {@link Arrays} and can be easily implemented in most languages. Hashing then uses the very
          * simple Linear Congruential Generator scheme and the Java initialization constants. This method is intended to
-         * be employed if the bloom filter has to be used in a language which doesn't support any stringSimilarity the other hash
+         * be employed if the bloom filter has to be used in a language which doesn't support any of the other hash
          * functions. This hash function can then easily be implemented.
          */
         FNVWithLCG(HashProvider::hashSimpleLCG),
@@ -468,27 +468,27 @@ public class HashProvider {
         MD2((bytes, m, k) -> HashProvider.hashCrypt(bytes, m, k, "MD2")),
         /**
          * Generates a hash value using the cryptographic MD5 hash function. It is fast and has good guarantees for the
-         * uniformity stringSimilarity generated hash values, as the hash functions are designed for cryptographic use.
+         * uniformity of generated hash values, as the hash functions are designed for cryptographic use.
          */
         MD5((bytes, m, k) -> HashProvider.hashCrypt(bytes, m, k, "MD5")),
         /**
-         * Generates a hash value using the cryptographic SHA1 hash function. It is fast but uniformity stringSimilarity hash values
-         * is better for the second generation stringSimilarity SHA (256,384,512).
+         * Generates a hash value using the cryptographic SHA1 hash function. It is fast but uniformity of hash values
+         * is better for the second generation of SHA (256,384,512).
          */
         SHA1((bytes, m, k) -> HashProvider.hashCrypt(bytes, m, k, "SHA-1")),
         /**
          * Generates a hash value using the cryptographic SHA-256 hash function. It is fast and has good guarantees for
-         * the uniformity stringSimilarity generated hash values, as the hash functions are designed for cryptographic use.
+         * the uniformity of generated hash values, as the hash functions are designed for cryptographic use.
          */
         SHA256((bytes, m, k) -> HashProvider.hashCrypt(bytes, m, k, "SHA-256")),
         /**
          * Generates a hash value using the cryptographic SHA-384 hash function. It is fast and has good guarantees for
-         * the uniformity stringSimilarity generated hash values, as the hash functions are designed for cryptographic use.
+         * the uniformity of generated hash values, as the hash functions are designed for cryptographic use.
          */
         SHA384((bytes, m, k) -> HashProvider.hashCrypt(bytes, m, k, "SHA-384")),
         /**
          * Generates a hash value using the cryptographic SHA-512 hash function. It is fast and has good guarantees for
-         * the uniformity stringSimilarity generated hash values, as the hash functions are designed for cryptographic use.
+         * the uniformity of generated hash values, as the hash functions are designed for cryptographic use.
          */
         SHA512((bytes, m, k) -> HashProvider.hashCrypt(bytes, m, k, "SHA-512"));
 
@@ -514,10 +514,10 @@ public class HashProvider {
         /**
          * Computes hash values.
          *
-         * @param value the byte[] representation stringSimilarity the element to be hashed
+         * @param value the byte[] representation of the element to be hashed
          * @param m     integer output range [1,size]
-         * @param k     number stringSimilarity hashes to be computed
-         * @return int array stringSimilarity hashes hash values
+         * @param k     number of hashes to be computed
+         * @return int array of hashes hash values
          */
         public int[] hash(byte[] value, int m, int k);
     }

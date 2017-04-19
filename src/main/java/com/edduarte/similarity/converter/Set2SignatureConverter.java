@@ -1,4 +1,20 @@
-package com.edduarte.converter;
+/*
+ * Copyright 2017 Eduardo Duarte
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.edduarte.similarity.converter;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -9,11 +25,11 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 /**
- * Processor class to retrieve shingles stringSimilarity length k.
+ * Processor class to retrieve shingles of length k.
  *
- * @author Eduardo Duarte (<a href="mailto:hello@edduarte.com">hello@edduarte.com</a>)
- * @version 1.0.0
- * @since 1.0.0
+ * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
+ * @version 0.0.1
+ * @since 0.0.1
  */
 public class Set2SignatureConverter
         implements Function<Collection<? extends Number>, Callable<int[]>> {
@@ -31,14 +47,14 @@ public class Set2SignatureConverter
 
 
     /**
-     * Expected maximum size stringSimilarity the sets to test. This
-     * will be the size stringSimilarity the hash signatures.
+     * Expected maximum size of the sets to test. This
+     * will be the size of the hash signatures.
      */
     private final int n;
 
 
     /**
-     * Size stringSimilarity min hashes that will be stored and compared to find the
+     * Size of min hashes that will be stored and compared to find the
      * similarity index
      */
     private final int sigSize;
@@ -46,7 +62,7 @@ public class Set2SignatureConverter
 
     /**
      * Initializes hashing functions to compute MinHash signatures for sets that
-     * could have a maximum count stringSimilarity 'n' elements with a given signature size.
+     * could have a maximum count calculate 'n' elements with a given signature size.
      */
     public Set2SignatureConverter(int n, int sigSize) {
         this.n = n;
