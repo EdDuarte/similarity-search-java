@@ -357,7 +357,7 @@ public interface Similarity<T> {
          * A threshold S that balances the number of false positives and false
          * negatives.
          */
-        public LSHFactory withThreshold(int threshold) {
+        public LSHFactory withThreshold(double threshold) {
             this.s = threshold;
             return this;
         }
