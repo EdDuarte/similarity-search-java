@@ -1,13 +1,14 @@
-# Near Neighbor Search
+# Similarity & Nearest Neighbor Search algorithms in Java
 
-[![Build Status](https://travis-ci.org/edduarte/near-neighbor-search.svg?branch=master)](https://travis-ci.org/edduarte/near-neighbor-search)
+[![Build Status](https://travis-ci.org/edduarte/similarity-search-java.svg?branch=master)](https://travis-ci.org/edduarte/similarity-search-java)
 
-Near Neighbor Search algorithms (as specified in "Mining of Massive Datasets",
-Cambridge University Press, Rajaraman, A., & Ullman, J. D.) implemented in Java.
-A similarity coefficient can be determined between two strings or two sets of
-numbers (any Collection that contains inheritors of java.lang.Number). This
-coefficient is a value between 0 and 1, where 0 means the two strings / sets are
-disjoint and 1 means they are equal.
+This library contains nearest neighbor search algorithms (as specified in
+"Mining of Massive Datasets", Cambridge University Press, Rajaraman, A., &
+Ullman, J. D.) implemented in Java, which can be used to determine similarity
+between text strings or sets of numbers (any Collection that contains inheritors
+of java.lang.Number). All algorithms return a similarity coefficient, a value
+between 0 and 1 where 1 means the two strings / sets are exactly equal and
+where 0 means they are disjoint.
 
 
 ## Quick Start
@@ -16,7 +17,7 @@ disjoint and 1 means they are equal.
 ```
 <dependency>
     <groupId>com.edduarte</groupId>
-    <artifactId>near-neighbor-search</artifactId>
+    <artifactId>similarity-search-java</artifactId>
     <version>0.0.1</version>
 </dependency>
 ```
@@ -24,7 +25,7 @@ disjoint and 1 means they are equal.
 ### Gradle
 ```
 dependencies {
-    compile 'com.edduarte:near-neighbor-search:0.0.1'
+    compile 'com.edduarte:similarity-search-java:0.0.1'
 }
 ```
 
