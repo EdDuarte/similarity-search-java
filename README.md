@@ -183,18 +183,21 @@ double similarity = Similarity.lsh()
 ```
 
 This will return the Jaccard similarity coefficient for strings / sets that are
-considered as candidate pairs, or return 0 if they are not candidate pairs. For
-a large dataset, this will estimate the Jaccard coefficient for a potentially
-smaller subset and ignore elements that are too dissimilar. This means that the
-result for candidate pairs will be deterministic while the result for
+considered to be candidate pairs, or return 0 if they are not candidate pairs. For
+a large dataset, this will only estimate the Jaccard coefficient for a smaller
+subset of that data and ignore elements that are too dissimilar. This also means
+that the result for candidate pairs will be deterministic while the result for
 non-candidate pairs will be non-deterministic.
+
 
 ### Internal classes
 
-So far the code samples have shown how to use the fluent interface available in
-the Similarity class. However, you can instantiate a number of classes that
-correspond to each step of the implemented near-neighbor search algorithms, and
-use them in your platform at your own accord.
+So far the code samples have shown how to use the builder paradigm available in
+the Similarity interface. However, you can instantiate a number of classes that
+correspond to each step of the implemented similarity search algorithms, and use
+them in your application at your own accord. Each of the converter classes below
+returns a result that could, for example, be stored in a database / cache for
+later use.
 
 ```java
 
@@ -205,31 +208,39 @@ int bands = 20;
 int rows = 5;
 ExecutorService exec = Executors.newCachedThreadPool();
 
-// generate shingles so they can be stored
+// generate shingles
 KShingler kShingler = new KShingler(shingleLength);
-List<CharSequence> shingles = exec.submit(kShingler.apply(string)).get();
+List<CharSequence> shingles1 = exec.submit(kShingler.apply("example string 1")).get();
+List<CharSequence> shingles2 = exec.submit(kShingler.apply("example string 2")).get();
 
 // get jaccard similarity coefficient
-double similarity = Similarity.jaccardIndex(shingles, otherShingles);
+double stringSimilarity = Similarity.jaccardIndex(shingles1, shingles2);
+double setSimilarity    = Similarity.jaccardIndex(exampleSet1, exampleSet2);
 
 // get signatures from shingles
-KShingles2SignatureConverter c = new KShingles2SignatureConverter(HashMethod.Murmur3, signatureSize);
-int[] stringSignature = exec.submit(c.apply(shingles)).get();
+KShingles2SignatureConverter c1 = new KShingles2SignatureConverter(HashMethod.Murmur3, signatureSize);
+int[] stringSignature1 = exec.submit(c1.apply(shingles1)).get();
+int[] stringSignature2 = exec.submit(c1.apply(shingles2)).get();
 
 // generate a universal-hash signature for sets
-Set2SignatureConverter c = new Set2SignatureConverter(n, signatureSize);
-int[] setSignature = exec.submit(c.apply(set)).get();
+Set2SignatureConverter c2 = new Set2SignatureConverter(n, signatureSize);
+int[] setSignature1 = exec.submit(c2.apply(exampleSet1)).get();
+int[] setSignature2 = exec.submit(c2.apply(exampleSet2)).get();
 
 // get minhash similarity coefficient
-double similarity = Similarity.signatureIndex(stringSignature, otherStringSignature);
+double stringSimilarity = Similarity.signatureIndex(stringSignature1, stringSignature2);
+double setSimilarity    = Similarity.signatureIndex(setSignature1, setSignature2);
 
 // convert signatures to bands
-Signature2BandsConverter c = new Signature2BandsConverter(bands, rows);
-int[] stringBands = exec.submit(c.apply(stringSignature)).get();
-int[] setBands = exec.submit(c.apply(setSignature)).get();
+Signature2BandsConverter c3 = new Signature2BandsConverter(bands, rows);
+int[] stringBands1 = exec.submit(c3.apply(stringSignature1)).get();
+int[] stringBands2 = exec.submit(c3.apply(stringSignature2)).get();
+int[] setBands1 = exec.submit(c3.apply(setSignature1)).get();
+int[] setBands2 = exec.submit(c3.apply(setSignature2)).get();
 
 // determine if there are any candidate pairs
-boolean isCandidatePair = Similarity.isCandidatePair(stringBands, otherStringBands);
+boolean isCandidatePair = Similarity.isCandidatePair(stringBands1, stringBands2);
+boolean isCandidatePair = Similarity.isCandidatePair(setBands1, setBands2);
 
 ```
 
