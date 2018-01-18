@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/edduarte/similarity-search-java.svg?branch=master)](https://travis-ci.org/edduarte/similarity-search-java)
 
-This library contains nearest-neighbor-search algorithms (as specified in
-"Mining of Massive Datasets", Cambridge University Press, Rajaraman, A., &
-Ullman, J. D.) implemented in Java, which can be used to determine the
-similarity between text Strings or sets of numbers (any Collection that contains
-inheritors of java.lang.Number). All algorithms return a similarity coefficient,
-a value between 0 and 1 where 1 means the two strings / sets are exactly equal
-and where 0 means they are disjoint.
+This library contains easy-to-use and high-performant nearest-neighbor-search
+algorithms (as specified in "Mining of Massive Datasets", Cambridge University
+Press, Rajaraman, A., & Ullman, J. D.) implemented in Java, which can be used to
+determine the similarity between text Strings or sets of numbers (any Collection
+that contains inheritors of java.lang.Number).
 
 To achieve a higher performance, all these algorithms are implemented so that
 multiple operations (counters, hashing, etc...) are executed in parallel (using
