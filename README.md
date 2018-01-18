@@ -4,7 +4,7 @@
 
 This library contains nearest neighbor search algorithms (as specified in
 "Mining of Massive Datasets", Cambridge University Press, Rajaraman, A., &
-Ullman, J. D.) implemented in Java, which can be used to determine similarity
+Ullman, J. D.) implemented in Java, which can be used to determine how similar
 between text strings or sets of numbers (any Collection that contains inheritors
 of java.lang.Number). All algorithms return a similarity coefficient, a value
 between 0 and 1 where 1 means the two strings / sets are exactly equal and
@@ -31,7 +31,8 @@ dependencies {
 
 ### Usage
 
-If you just need an easy way to get the similarity coefficient, use this:
+If you just need an easy way to figure out how similar two strings or
+number-sets are, use this:
 
 ```java
 // for strings
@@ -41,8 +42,9 @@ double similarity = Similarity.jaccard().of(string1, string2);
 double similarity = Similarity.jaccard().of(set1, set2);
 ```
 
-Every Similarity operation is available through the simple fluent / Builder
-interface in the Similarity class.
+This will return a similarity coefficient, a value between 0 and 1
+where 1 means the two strings or sets are exactly equal and
+where 0 means they are disjoint.
 
 In the case of string similarity, you might need to set an appropriate shingle
 length based on the size of your strings. A shingle length of 2 is used by
@@ -66,6 +68,9 @@ go for a probabilistic approach like Minhashing or LSH, detailed in the
 
 
 ## Advanced
+
+Every Similarity operation is available through the simple fluent / builder
+interface in the Similarity class.
 
 ### Jaccard
 
