@@ -185,11 +185,11 @@ double similarity = Similarity.lsh()
 ```
 
 This will return the Jaccard similarity coefficient for strings / sets that are
-considered to be candidate pairs, or return 0 if they are not candidate pairs. For
-a large dataset, this will only estimate the Jaccard coefficient for a smaller
-subset of that data and ignore elements that are too dissimilar. This also means
-that the result for candidate pairs will be deterministic while the result for
-non-candidate pairs will be non-deterministic.
+considered to be candidate pairs, or return 0 if they are not candidate pairs.
+In other words, this will perform the expensive Jaccard coefficient call only
+for a smaller subset of a dataset and ignore elements that are too dissimilar.
+This also means that the result for candidate pairs will be deterministic while
+the result for non-candidate pairs will be non-deterministic.
 
 
 ### Internal classes
@@ -203,40 +203,39 @@ later use.
 
 ```java
 
+// initialize example values and converter classes
 String exampleString = "example string";
 Set<Integer> exampleSet = Set.of(1, 2, 3, 4, 5);
-
-ExecutorService exec = Executors.newCachedThreadPool();
-int n = 5;
 int shingleLength = 2;
 int signatureSize = 100;
+int n = 5;
 int bands = 20;
 int rows = 5;
 
 // generate shingles
-KShingler kShingler = new KShingler(shingleLength);
-List<CharSequence> shingles = exec.submit(kShingler.apply(exampleString)).get();
+KShingler c1 = new KShingler(shingleLength);
+List<CharSequence> shingles = c1.apply(exampleString).call();
 
 // get jaccard similarity coefficient
 double stringSimilarity = Similarity.jaccardIndex(shingles1, shingles2);
 double setSimilarity    = Similarity.jaccardIndex(exampleSet1, exampleSet2);
 
 // get signatures from shingles
-KShingles2SignatureConverter c1 = new KShingles2SignatureConverter(HashMethod.Murmur3, signatureSize);
-int[] stringSignature = exec.submit(c1.apply(shingles)).get();
+KShingles2SignatureConverter c2 = new KShingles2SignatureConverter(HashMethod.Murmur3, signatureSize);
+int[] stringSignature = c2.apply(shingles).call();
 
 // generate a universal-hash signature for sets
-Set2SignatureConverter c2 = new Set2SignatureConverter(n, signatureSize);
-int[] setSignature = exec.submit(c2.apply(exampleSet)).get();
+Set2SignatureConverter c3 = new Set2SignatureConverter(n, signatureSize);
+int[] setSignature = c3.apply(exampleSet).call();
 
 // get minhash similarity coefficient
 double stringSimilarity = Similarity.signatureIndex(stringSignature1, stringSignature2);
 double setSimilarity    = Similarity.signatureIndex(setSignature1, setSignature2);
 
 // convert signatures to bands
-Signature2BandsConverter c3 = new Signature2BandsConverter(bands, rows);
-int[] stringBands = exec.submit(c3.apply(stringSignature)).get();
-int[] setBands = exec.submit(c3.apply(setSignature)).get();
+Signature2BandsConverter c4 = new Signature2BandsConverter(bands, rows);
+int[] stringBands = c4.apply(stringSignature).call();
+int[] setBands = c4.apply(setSignature).call();
 
 // determine if there are any candidate pairs
 boolean isCandidatePair = Similarity.isCandidatePair(stringBands1, stringBands2);
