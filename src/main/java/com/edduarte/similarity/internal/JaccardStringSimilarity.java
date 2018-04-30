@@ -32,9 +32,9 @@ import java.util.concurrent.Future;
  */
 public class JaccardStringSimilarity implements StringSimilarity {
 
-  private final ExecutorService exec;
+  protected final ExecutorService exec;
 
-  private final KShingler kShingler;
+  protected final KShingler kShingler;
 
 
   /**
@@ -53,17 +53,14 @@ public class JaccardStringSimilarity implements StringSimilarity {
   @Override
   public double calculate(String s1, String s2) {
     ShinglePair shingles = getShingles(s1, s2);
-    double similarity = Similarity.jaccardIndex(
-        shingles.shingles1,
-        shingles.shingles2
+    return Similarity.jaccardIndex(
+        shingles.getShingles1(),
+        shingles.getShingles2()
     );
-    shingles = null;
-    return similarity;
   }
 
 
-  ShinglePair getShingles(String s1, String s2) {
-
+  protected ShinglePair getShingles(String s1, String s2) {
     Future<List<CharSequence>> future1 = exec.submit(kShingler.apply(s1));
     Future<List<CharSequence>> future2 = exec.submit(kShingler.apply(s2));
 
@@ -78,16 +75,28 @@ public class JaccardStringSimilarity implements StringSimilarity {
   }
 
 
-  static class ShinglePair {
+  protected static class ShinglePair {
 
-    final List<CharSequence> shingles1;
+    private final List<CharSequence> shingles1;
 
-    final List<CharSequence> shingles2;
+    private final List<CharSequence> shingles2;
 
 
-    ShinglePair(List<CharSequence> shingles1, List<CharSequence> shingles2) {
+    protected ShinglePair(
+        List<CharSequence> shingles1,
+        List<CharSequence> shingles2) {
       this.shingles1 = shingles1;
       this.shingles2 = shingles2;
+    }
+
+
+    public List<CharSequence> getShingles1() {
+      return shingles1;
+    }
+
+
+    public List<CharSequence> getShingles2() {
+      return shingles2;
     }
   }
 }

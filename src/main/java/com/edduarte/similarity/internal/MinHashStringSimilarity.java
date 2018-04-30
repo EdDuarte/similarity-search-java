@@ -34,11 +34,11 @@ import java.util.concurrent.Future;
  */
 public class MinHashStringSimilarity implements StringSimilarity {
 
-  private final ExecutorService exec;
+  protected final ExecutorService exec;
 
-  private final JaccardStringSimilarity jaccard;
+  protected final JaccardStringSimilarity jaccard;
 
-  private final KShingles2SignatureConverter p;
+  protected final KShingles2SignatureConverter p;
 
 
   /**
@@ -52,8 +52,10 @@ public class MinHashStringSimilarity implements StringSimilarity {
    * @param k       the length k of the shingles to generate
    */
   public MinHashStringSimilarity(
-      ExecutorService exec, int sigSize,
-      HashMethod hash, int k) {
+      ExecutorService exec,
+      int sigSize,
+      HashMethod hash,
+      int k) {
     this.jaccard = new JaccardStringSimilarity(exec, k);
     this.p = new KShingles2SignatureConverter(hash, sigSize);
     this.exec = exec;
@@ -63,12 +65,12 @@ public class MinHashStringSimilarity implements StringSimilarity {
   @Override
   public double calculate(String s1, String s2) {
     JaccardStringSimilarity.ShinglePair p = jaccard.getShingles(s1, s2);
-    int[][] signatures = getSignatures(p.shingles1, p.shingles2);
+    int[][] signatures = getSignatures(p.getShingles1(), p.getShingles2());
     return Similarity.signatureIndex(signatures[0], signatures[1]);
   }
 
 
-  private int[][] getSignatures(
+  protected int[][] getSignatures(
       List<CharSequence> shingles1,
       List<CharSequence> shingles2) {
     Future<int[]> signatureFuture1 = exec.submit(p.apply(shingles1));

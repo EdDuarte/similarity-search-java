@@ -19,7 +19,7 @@ package com.edduarte.similarity.converter;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -31,7 +31,7 @@ import java.util.function.Function;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class Set2SignatureConverter
+public final class Set2SignatureConverter
     implements Function<Collection<? extends Number>, Callable<int[]>> {
 
   /**
@@ -79,7 +79,7 @@ public class Set2SignatureConverter
 
   @Override
   public Callable<int[]> apply(Collection<? extends Number> set) {
-    return new HashCallable(n, sigSize, a, b, set);
+    return new HashCallable(n, sigSize, a, b, new ArrayList<>(set));
   }
 
 
@@ -95,32 +95,32 @@ public class Set2SignatureConverter
 
     private final int[] b;
 
-    private final Collection<? extends Number> set;
+    private final List<? extends Number> list;
 
 
     private HashCallable(
-        int n, int sigSize,
-        int[] a, int[] b,
-        Collection<? extends Number> set) {
+        int n,
+        int sigSize,
+        int[] a,
+        int[] b,
+        List<? extends Number> list) {
       this.n = n;
       this.sigSize = sigSize;
       this.a = a;
       this.b = b;
-      this.set = set;
+      this.list = list;
     }
 
 
     @Override
-    public int[] call() throws Exception {
+    public int[] call() {
       int[] signature = new int[sigSize];
 
       for (int i = 0; i < sigSize; i++) {
         signature[i] = Integer.MAX_VALUE;
       }
 
-      List<? extends Number> list = new ArrayList<>(set);
-      Collections.sort(list, (o1, o2) ->
-          Long.compare(o1.longValue(), o2.longValue()));
+      list.sort(Comparator.comparingLong(Number::longValue));
 
       for (final Number x : list) {
         for (int i = 0; i < sigSize; i++) {

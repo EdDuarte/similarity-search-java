@@ -19,6 +19,7 @@ package com.edduarte.similarity.converter;
 import com.edduarte.similarity.hash.HashProvider.HashMethod;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class KShingles2SignatureConverter
+public final class KShingles2SignatureConverter
     implements Function<List<CharSequence>, Callable<int[]>> {
 
   private final HashMethod hash;
@@ -48,7 +49,7 @@ public class KShingles2SignatureConverter
 
   @Override
   public Callable<int[]> apply(List<CharSequence> shingles) {
-    return new SignatureCallable(shingles, hash, sigSize);
+    return new SignatureCallable(new ArrayList<>(shingles), hash, sigSize);
   }
 
 

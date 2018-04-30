@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class KShingler
+public final class KShingler
     implements Function<CharSequence, Callable<List<CharSequence>>> {
 
   /**
@@ -67,7 +67,8 @@ public class KShingler
 
 
     private ShingleCallable(
-        int k, CharSequence text,
+        int k,
+        CharSequence text,
         Predicate<CharSequence> stopper) {
       this.k = k;
       this.text = text;

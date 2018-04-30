@@ -33,13 +33,13 @@ import java.util.concurrent.Future;
  */
 public class LSHStringSimilarity implements StringSimilarity {
 
-  private final JaccardStringSimilarity jaccard;
+  protected final JaccardStringSimilarity jaccard;
 
-  private final KShingles2SignatureConverter sigp;
+  protected final KShingles2SignatureConverter sigp;
 
-  private final Signature2BandsConverter bandp;
+  protected final Signature2BandsConverter bandp;
 
-  private final ExecutorService exec;
+  protected final ExecutorService exec;
 
 
   /**
@@ -57,8 +57,12 @@ public class LSHStringSimilarity implements StringSimilarity {
    * @param k    the length k of the shingles to generate
    */
   public LSHStringSimilarity(
-      ExecutorService exec, int b, int r, double s,
-      HashMethod hash, int k) {
+      ExecutorService exec,
+      int b,
+      int r,
+      double s,
+      HashMethod hash,
+      int k) {
     // signature size is determined by a threshold S
     int R = (int) Math.ceil(Math.log(1.0 / b) / Math.log(s)) + 1;
     int signatureSize = R * b;
@@ -72,27 +76,23 @@ public class LSHStringSimilarity implements StringSimilarity {
 
   @Override
   public double calculate(String s1, String s2) {
-    return isCandidatePair(s1, s2) ?
-        jaccard.calculate(s1, s2) : 0;
+    return isCandidatePair(s1, s2) ? jaccard.calculate(s1, s2) : 0;
   }
 
 
   public boolean isCandidatePair(String s1, String s2) {
-    JaccardStringSimilarity.ShinglePair pair =
-        jaccard.getShingles(s1, s2);
+    JaccardStringSimilarity.ShinglePair pair = jaccard.getShingles(s1, s2);
     try {
-      Future<int[]> signatureFuture1 = exec
-          .submit(sigp.apply(pair.shingles1));
-      Future<int[]> signatureFuture2 = exec
-          .submit(sigp.apply(pair.shingles2));
+      Future<int[]> signatureFuture1 =
+          exec.submit(sigp.apply(pair.getShingles1()));
+      Future<int[]> signatureFuture2 =
+          exec.submit(sigp.apply(pair.getShingles2()));
 
       int[] signature1 = signatureFuture1.get();
       int[] signature2 = signatureFuture2.get();
 
-      Future<int[]> bandsFuture1 = exec
-          .submit(bandp.apply(signature1));
-      Future<int[]> bandsFuture2 = exec
-          .submit(bandp.apply(signature2));
+      Future<int[]> bandsFuture1 = exec.submit(bandp.apply(signature1));
+      Future<int[]> bandsFuture2 = exec.submit(bandp.apply(signature2));
 
       int[] bands1 = bandsFuture1.get();
       int[] bands2 = bandsFuture2.get();

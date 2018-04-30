@@ -33,13 +33,13 @@ import java.util.concurrent.Future;
  */
 public class LSHSetSimilarity implements SetSimilarity {
 
-  private final JaccardSetSimilarity jaccard;
+  protected final JaccardSetSimilarity jaccard;
 
-  private final Set2SignatureConverter sigp;
+  protected final Set2SignatureConverter sigp;
 
-  private final Signature2BandsConverter bandp;
+  protected final Signature2BandsConverter bandp;
 
-  private final ExecutorService exec;
+  protected final ExecutorService exec;
 
 
   /**
@@ -70,12 +70,11 @@ public class LSHSetSimilarity implements SetSimilarity {
   public double calculate(
       Collection<? extends Number> c1,
       Collection<? extends Number> c2) {
-    return isCandidatePair(c1, c2) ?
-        jaccard.calculate(c1, c2) : 0;
+    return isCandidatePair(c1, c2) ? jaccard.calculate(c1, c2) : 0;
   }
 
 
-  private boolean isCandidatePair(
+  protected boolean isCandidatePair(
       Collection<? extends Number> c1,
       Collection<? extends Number> c2) {
     try {

@@ -32,9 +32,9 @@ import java.util.concurrent.Future;
  */
 public class MinHashSetSimilarity implements SetSimilarity {
 
-  private final Set2SignatureConverter p;
+  protected final Set2SignatureConverter p;
 
-  private final ExecutorService exec;
+  protected final ExecutorService exec;
 
 
   /**
