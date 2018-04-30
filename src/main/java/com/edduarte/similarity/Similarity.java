@@ -30,15 +30,15 @@ public interface Similarity<T> {
 
 
     public static JaccardFactory jaccard() {
-        return new JaccardFactory();
+        return JaccardFactory.SINGLETON;
     }
 
     public static MinHashFactory minhash() {
-        return new MinHashFactory();
+        return MinHashFactory.SINGLETON;
     }
 
     public static LSHFactory lsh() {
-        return new LSHFactory();
+        return LSHFactory.SINGLETON;
     }
 
 
@@ -134,18 +134,25 @@ public interface Similarity<T> {
 
     public static final class JaccardFactory {
 
+        private static final JaccardFactory SINGLETON = new JaccardFactory();
+
         // sensible defaults for common small strings (smaller than an email)
         // or small collections (between 10 to 40 elements)
-        private int k = 2;
+        private int k;
 
-        private ExecutorService exec = null;
+        private ExecutorService exec;
+
+
+        private JaccardFactory() {
+            this.k = 2;
+        }
 
 
         /**
          * Length of n-gram shingles that are used for comparison (used for
          * strings only).
          */
-        public JaccardFactory withShingleLength(int shingleLength) {
+        public synchronized JaccardFactory withShingleLength(int shingleLength) {
             this.k = shingleLength;
             return this;
         }
@@ -155,7 +162,7 @@ public interface Similarity<T> {
          * An executor where the kshingling tasks are spawned. If nothing is
          * provided then it launches a new executor with the cached thread pool.
          */
-        public JaccardFactory withExecutor(ExecutorService executor) {
+        public synchronized JaccardFactory withExecutor(ExecutorService executor) {
             this.exec = executor;
             return this;
         }
@@ -187,24 +194,33 @@ public interface Similarity<T> {
 
     public static final class MinHashFactory {
 
+        private static final MinHashFactory SINGLETON = new MinHashFactory();
+
         // sensible defaults for common small strings (smaller than an email)
         // or small collections (between 10 to 40 elements)
-        private int k = 2;
+        private int k;
 
-        private int n = -1;
+        private int n;
 
-        private int sigSize = 100;
+        private int sigSize;
 
-        private HashMethod h = HashMethod.Murmur3;
+        private HashMethod h;
 
-        private ExecutorService exec = null;
+        private ExecutorService exec;
+
+        private MinHashFactory() {
+            this.k = 2;
+            this.n = -1;
+            this.sigSize = 100;
+            this.h = HashMethod.Murmur3;
+        }
 
 
         /**
          * Length of n-gram shingles that are used for comparison (used for
          * strings only).
          */
-        public MinHashFactory withShingleLength(int shingleLength) {
+        public synchronized MinHashFactory withShingleLength(int shingleLength) {
             this.k = shingleLength;
             return this;
         }
@@ -216,7 +232,7 @@ public interface Similarity<T> {
          * should be 7. If nothing is provided, this value is determined in
          * pre-processing.
          */
-        public MinHashFactory withNumberOfElements(int elementCount) {
+        public synchronized MinHashFactory withNumberOfElements(int elementCount) {
             this.n = elementCount;
             return this;
         }
@@ -226,7 +242,7 @@ public interface Similarity<T> {
          * The size of the generated signatures, which are compared to determine
          * similarity.
          */
-        public MinHashFactory withSignatureSize(int signatureSize) {
+        public synchronized MinHashFactory withSignatureSize(int signatureSize) {
             this.sigSize = signatureSize;
             return this;
         }
@@ -236,7 +252,7 @@ public interface Similarity<T> {
          * The hashing algorithm used to hash shingles to signatures (used for
          * strings only).
          */
-        public MinHashFactory withHashMethod(HashMethod hashMethod) {
+        public synchronized MinHashFactory withHashMethod(HashMethod hashMethod) {
             this.h = hashMethod;
             return this;
         }
@@ -247,7 +263,7 @@ public interface Similarity<T> {
          * spawned. If nothing is provided then it launches a new executor with
          * the cached thread pool.
          */
-        public MinHashFactory withExecutor(ExecutorService executor) {
+        public synchronized MinHashFactory withExecutor(ExecutorService executor) {
             this.exec = executor;
             return this;
         }
@@ -296,28 +312,40 @@ public interface Similarity<T> {
 
     public static final class LSHFactory {
 
+        private static final LSHFactory SINGLETON = new LSHFactory();
+
         // sensible defaults for common small strings (smaller than an email)
         // or small collections (between 10 to 40 elements)
-        private int k = 2;
+        private int k;
 
-        private int n = -1;
+        private int n;
 
-        private int b = 20;
+        private int b;
 
-        private int r = 5;
+        private int r;
 
-        private double s = 0.5;
+        private double s;
 
-        private HashMethod h = HashMethod.Murmur3;
+        private HashMethod h;
 
-        private ExecutorService exec = null;
+        private ExecutorService exec;
+
+
+        private LSHFactory() {
+            this.k = 2;
+            this.n = -1;
+            this.b = 20;
+            this.r = 5;
+            this.s = 0.5;
+            this.h = HashMethod.Murmur3;
+        }
 
 
         /**
          * Length of n-gram shingles that are used when generating signatures
          * (used for strings only).
          */
-        public LSHFactory withShingleLength(int shingleLength) {
+        public synchronized LSHFactory withShingleLength(int shingleLength) {
             this.k = shingleLength;
             return this;
         }
@@ -329,7 +357,7 @@ public interface Similarity<T> {
          * should be 7. If nothing is provided, this value is determined in
          * pre-processing.
          */
-        public LSHFactory withNumberOfElements(int elementCount) {
+        public synchronized LSHFactory withNumberOfElements(int elementCount) {
             this.n = elementCount;
             return this;
         }
@@ -338,7 +366,7 @@ public interface Similarity<T> {
         /**
          * The number of bands where the minhash signatures will be structured.
          */
-        public LSHFactory withNumberOfBands(int bandCount) {
+        public synchronized LSHFactory withNumberOfBands(int bandCount) {
             this.b = bandCount;
             return this;
         }
@@ -347,7 +375,7 @@ public interface Similarity<T> {
         /**
          * The number of rows where the minhash signatures will be structured.
          */
-        public LSHFactory withNumberOfRows(int rowCount) {
+        public synchronized LSHFactory withNumberOfRows(int rowCount) {
             this.r = rowCount;
             return this;
         }
@@ -357,7 +385,7 @@ public interface Similarity<T> {
          * A threshold S that balances the number of false positives and false
          * negatives.
          */
-        public LSHFactory withThreshold(double threshold) {
+        public synchronized LSHFactory withThreshold(double threshold) {
             this.s = threshold;
             return this;
         }
@@ -367,7 +395,7 @@ public interface Similarity<T> {
          * The hashing algorithm used to hash shingles to signatures (used for
          * strings only).
          */
-        public LSHFactory withHashMethod(HashMethod hashMethod) {
+        public synchronized LSHFactory withHashMethod(HashMethod hashMethod) {
             this.h = hashMethod;
             return this;
         }
@@ -378,7 +406,7 @@ public interface Similarity<T> {
          * spawned. If nothing is provided then it launches a new executor with
          * the cached thread pool.
          */
-        public LSHFactory withExecutor(ExecutorService executor) {
+        public synchronized LSHFactory withExecutor(ExecutorService executor) {
             this.exec = executor;
             return this;
         }
