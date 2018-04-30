@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
@@ -17,22 +16,20 @@ import java.util.concurrent.Executors;
  */
 public final class LSHFactory extends Factory {
 
-  static final LSHFactory SINGLETON = new LSHFactory();
+  private int k;
 
-  private final int k;
+  private int n;
 
-  private final int n;
+  private int b;
 
-  private final int b;
+  private int r;
 
-  private final int r;
+  private double s;
 
-  private final double s;
-
-  private final HashProvider.HashMethod h;
+  private HashProvider.HashMethod h;
 
 
-  private LSHFactory() {
+  LSHFactory() {
     super();
     // sensible defaults for common small strings (smaller than an email)
     // or small collections (between 10 to 40 elements)
@@ -45,50 +42,13 @@ public final class LSHFactory extends Factory {
   }
 
 
-  private LSHFactory(
-      int k,
-      int n,
-      int b,
-      int r,
-      double s,
-      HashProvider.HashMethod h,
-      ExecutorService exec) {
-    super(exec);
-    this.k = k;
-    this.n = n;
-    this.b = b;
-    this.r = r;
-    this.s = s;
-    this.h = h;
-  }
-
-
-  public LSHFactory with(
-      int shingleLength,
-      int elementCount,
-      int bandCount,
-      int rowCount,
-      double threshold,
-      HashProvider.HashMethod hashMethod,
-      ExecutorService executor) {
-    return new LSHFactory(
-        shingleLength,
-        elementCount,
-        bandCount,
-        rowCount,
-        threshold,
-        hashMethod,
-        executor
-    );
-  }
-
-
   /**
    * Length of n-gram shingles that are used when generating signatures
    * (used for strings only).
    */
-  public LSHFactory withShingleLength(int shingleLength) {
-    return new LSHFactory(shingleLength, n, b, r, s, h, exec);
+  public synchronized LSHFactory withShingleLength(int shingleLength) {
+    this.k = shingleLength;
+    return this;
   }
 
 
@@ -98,24 +58,27 @@ public final class LSHFactory extends Factory {
    * should be 7. If nothing is provided, this value is determined in
    * pre-processing.
    */
-  public LSHFactory withNumberOfElements(int elementCount) {
-    return new LSHFactory(k, elementCount, b, r, s, h, exec);
+  public synchronized LSHFactory withNumberOfElements(int elementCount) {
+    this.n = elementCount;
+    return this;
   }
 
 
   /**
    * The number of bands where the minhash signatures will be structured.
    */
-  public LSHFactory withNumberOfBands(int bandCount) {
-    return new LSHFactory(k, n, bandCount, r, s, h, exec);
+  public synchronized LSHFactory withNumberOfBands(int bandCount) {
+    this.b = bandCount;
+    return this;
   }
 
 
   /**
    * The number of rows where the minhash signatures will be structured.
    */
-  public LSHFactory withNumberOfRows(int rowCount) {
-    return new LSHFactory(k, n, b, rowCount, s, h, exec);
+  public synchronized LSHFactory withNumberOfRows(int rowCount) {
+    this.r = rowCount;
+    return this;
   }
 
 
@@ -123,8 +86,9 @@ public final class LSHFactory extends Factory {
    * A threshold S that balances the number of false positives and false
    * negatives.
    */
-  public LSHFactory withThreshold(double threshold) {
-    return new LSHFactory(k, n, b, r, threshold, h, exec);
+  public synchronized LSHFactory withThreshold(double threshold) {
+    this.s = threshold;
+    return this;
   }
 
 
@@ -132,8 +96,9 @@ public final class LSHFactory extends Factory {
    * The hashing algorithm used to hash shingles to signatures (used for
    * strings only).
    */
-  public LSHFactory withHashMethod(HashProvider.HashMethod hashMethod) {
-    return new LSHFactory(k, n, b, r, s, hashMethod, exec);
+  public synchronized LSHFactory withHashMethod(HashProvider.HashMethod hashMethod) {
+    this.h = hashMethod;
+    return this;
   }
 
 
@@ -142,47 +107,30 @@ public final class LSHFactory extends Factory {
    * spawned. If nothing is provided then it launches a new executor with
    * the cached thread pool.
    */
-  public LSHFactory withExecutor(ExecutorService executor) {
-    return new LSHFactory(k, n, b, r, s, h, executor);
+  public synchronized LSHFactory withExecutor(ExecutorService executor) {
+    setExec(executor);
+    return this;
   }
 
 
-  public double of(String s1, String s2) {
-    ExecutorService e = exec;
-    boolean usingDefaultExec = false;
-    if (e == null || e.isShutdown()) {
-      e = Executors.newCachedThreadPool();
-      usingDefaultExec = true;
-    }
-    LSHStringSimilarity j = new LSHStringSimilarity(e, b, r, s, h, k);
-    double index = j.calculate(s1, s2);
-    if (usingDefaultExec) {
-      closeExecutor();
-    }
-    return index;
+  @Override
+  protected StringSimilarity initStringSimilarityTask(
+      String s1, String s2, ExecutorService exec) {
+    return new LSHStringSimilarity(s1, s2, b, r, s, h, k, exec);
   }
 
 
-  public double of(
+  @Override
+  protected SetSimilarity initSetSimilarityTask(
       Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
-    ExecutorService e = exec;
-    boolean usingDefaultExec = false;
-    if (e == null || e.isShutdown()) {
-      e = Executors.newCachedThreadPool();
-      usingDefaultExec = true;
-    }
+      Collection<? extends Number> c2,
+      ExecutorService exec) {
     int nAux = n;
     if (nAux < 0) {
       Set<Number> unionSet = new HashSet<>(c1);
       unionSet.addAll(c2);
-      nAux = (int) unionSet.parallelStream().distinct().count();
+      nAux = (int) unionSet.stream().distinct().count();
     }
-    LSHSetSimilarity j = new LSHSetSimilarity(e, nAux, b, r, s);
-    double index = j.calculate(c1, c2);
-    if (usingDefaultExec) {
-      closeExecutor();
-    }
-    return index;
+    return new LSHSetSimilarity(c1, c2, nAux, b, r, s, exec);
   }
 }

@@ -28,20 +28,23 @@ import java.util.Set;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class JaccardSetSimilarity implements SetSimilarity {
-
+public class JaccardSetSimilarity extends SetSimilarity {
 
   /**
    * Instantiates a Similarity class for number sets using the Jaccard
    * algorithm.
    */
-  public JaccardSetSimilarity() {
+  public JaccardSetSimilarity(
+      Collection<? extends Number> c1,
+      Collection<? extends Number> c2) {
+    super(c1, c2);
   }
 
 
-  public double calculate(
-      Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
+  @Override
+  public double getAsDouble() {
+    Collection<? extends Number> c1 = getFirst();
+    Collection<? extends Number> c2 = getSecond();
     Set<Number> intersectionSet = new HashSet<>();
     for (Number number : c1) {
       if (c2.contains(number)) {

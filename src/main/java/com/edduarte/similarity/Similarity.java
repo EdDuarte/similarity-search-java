@@ -4,24 +4,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 /**
  * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
  * @version 0.0.1
  * @since 0.0.1
  */
-public interface Similarity<T> {
+public interface Similarity<T>
+    extends DoubleSupplier, BooleanSupplier, Supplier<Double> {
+
+  double CONFIDENCE_THRESHOLD = 0.5;
 
   static JaccardFactory jaccard() {
-    return JaccardFactory.SINGLETON;
+    return new JaccardFactory();
   }
 
   static MinHashFactory minhash() {
-    return MinHashFactory.SINGLETON;
+    return new MinHashFactory();
   }
 
   static LSHFactory lsh() {
-    return LSHFactory.SINGLETON;
+    return new LSHFactory();
   }
 
   static double jaccardIndex(int intersectionCount, int unionCount) {
@@ -91,6 +97,20 @@ public interface Similarity<T> {
     return false;
   }
 
-  double calculate(T t1, T t2);
+  T getFirst();
 
+  T getSecond();
+
+  @Override
+  double getAsDouble();
+
+  @Override
+  default boolean getAsBoolean() {
+    return getAsDouble() >= CONFIDENCE_THRESHOLD;
+  }
+
+  @Override
+  default Double get() {
+    return getAsDouble();
+  }
 }

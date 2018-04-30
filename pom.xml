@@ -22,13 +22,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.edduarte</groupId>
-    <artifactId>near-neighbor-search</artifactId>
+    <artifactId>similarity-search-java</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>Near-Neighbor Search</name>
-    <url>https://github.com/edduarte/near-neighbor-search</url>
-    <description>Near-Neighbor Search (Jaccard Distance, K-Shingling, Minhashing and Locality-Sensitive Hashing) implementation in Java</description>
+    <url>https://github.com/edduarte/similarity-search-java</url>
+    <description>Easy-to-use Java similarity algorithms (Jaccard Distance, K-Shingling, Minhashing, Locality-Sensitive Hashing) for text and number-series.</description>
 
     <licenses>
         <license>

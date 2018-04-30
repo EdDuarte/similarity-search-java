@@ -21,6 +21,7 @@ import com.edduarte.similarity.Similarity;
 import com.edduarte.similarity.converter.Set2SignatureConverter;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -30,7 +31,7 @@ import java.util.concurrent.Future;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class MinHashSetSimilarity implements SetSimilarity {
+public class MinHashSetSimilarity extends SetSimilarity {
 
   protected final Set2SignatureConverter p;
 
@@ -46,16 +47,23 @@ public class MinHashSetSimilarity implements SetSimilarity {
    * @param n       the total number of unique elements in both sets
    * @param sigSize the length of the signature array to be generated
    */
-  public MinHashSetSimilarity(ExecutorService exec, int n, int sigSize) {
-    this.exec = exec;
+  public MinHashSetSimilarity(
+      Collection<? extends Number> c1,
+      Collection<? extends Number> c2,
+      int n,
+      int sigSize,
+      ExecutorService exec) {
+    super(c1, c2);
+    Objects.requireNonNull(exec, "Executor must not be null");
     this.p = new Set2SignatureConverter(n, sigSize);
+    this.exec = exec;
   }
 
 
   @Override
-  public double calculate(
-      Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
+  public double getAsDouble() {
+    Collection<? extends Number> c1 = getFirst();
+    Collection<? extends Number> c2 = getSecond();
     Future<int[]> signatureFuture1 = exec.submit(p.apply(c1));
     Future<int[]> signatureFuture2 = exec.submit(p.apply(c2));
 
@@ -68,6 +76,9 @@ public class MinHashSetSimilarity implements SetSimilarity {
     } catch (ExecutionException | InterruptedException ex) {
       String m = "There was a problem processing set signatures.";
       throw new RuntimeException(m, ex);
+    } finally {
+      signatureFuture1 = null;
+      signatureFuture2 = null;
     }
   }
 }

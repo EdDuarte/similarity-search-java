@@ -80,7 +80,7 @@ public final class KShingles2SignatureConverter
         sig[i] = Integer.MAX_VALUE;
       }
 
-      List<String> aux = shingles.parallelStream()
+      List<String> aux = shingles.stream()
           .map(CharSequence::toString)
           .collect(Collectors.toList());
 

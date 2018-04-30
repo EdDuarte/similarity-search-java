@@ -23,6 +23,7 @@ import com.edduarte.similarity.converter.KShingles2SignatureConverter;
 import com.edduarte.similarity.hash.HashProvider.HashMethod;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -32,7 +33,7 @@ import java.util.concurrent.Future;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class MinHashStringSimilarity implements StringSimilarity {
+public class MinHashStringSimilarity extends StringSimilarity {
 
   protected final ExecutorService exec;
 
@@ -52,18 +53,25 @@ public class MinHashStringSimilarity implements StringSimilarity {
    * @param k       the length k of the shingles to generate
    */
   public MinHashStringSimilarity(
-      ExecutorService exec,
+      String s1,
+      String s2,
       int sigSize,
       HashMethod hash,
-      int k) {
-    this.jaccard = new JaccardStringSimilarity(exec, k);
+      int k,
+      ExecutorService exec) {
+    super(s1, s2);
+    Objects.requireNonNull(hash, "Hash method must not be null");
+    Objects.requireNonNull(exec, "Executor must not be null");
+    this.jaccard = new JaccardStringSimilarity(s1, s2, k, exec);
     this.p = new KShingles2SignatureConverter(hash, sigSize);
     this.exec = exec;
   }
 
 
   @Override
-  public double calculate(String s1, String s2) {
+  public double getAsDouble() {
+    String s1 = getFirst();
+    String s2 = getSecond();
     JaccardStringSimilarity.ShinglePair p = jaccard.getShingles(s1, s2);
     int[][] signatures = getSignatures(p.getShingles1(), p.getShingles2());
     return Similarity.signatureIndex(signatures[0], signatures[1]);
@@ -88,6 +96,9 @@ public class MinHashStringSimilarity implements StringSimilarity {
     } catch (ExecutionException | InterruptedException ex) {
       String m = "There was a problem processing shingle signatures.";
       throw new RuntimeException(m, ex);
+    } finally {
+      signatureFuture1 = null;
+      signatureFuture2 = null;
     }
   }
 }

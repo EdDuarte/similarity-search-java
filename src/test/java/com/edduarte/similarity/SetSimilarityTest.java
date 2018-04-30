@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import static org.junit.Assert.assertEquals;
 
@@ -77,11 +78,11 @@ public class SetSimilarityTest {
         .withSignatureSize(200)
         .withExecutor(executorService);
     assertEquals(1.0, s.of(c1, c2), 0);
-    assertEquals(0.495, s.of(c1, c3), 0.2);
-    assertEquals(0.495, s.of(c2, c3), 0.2);
-    assertEquals(0.705, s.of(c1, c4), 0.2);
-    assertEquals(0.705, s.of(c2, c4), 0.2);
-    assertEquals(0.365, s.of(c3, c4), 0.2);
+    assertEquals(0.495, s.of(c1, c3), 0.3);
+    assertEquals(0.495, s.of(c2, c3), 0.3);
+    assertEquals(0.705, s.of(c1, c4), 0.3);
+    assertEquals(0.705, s.of(c2, c4), 0.3);
+    assertEquals(0.365, s.of(c3, c4), 0.3);
   }
 
 

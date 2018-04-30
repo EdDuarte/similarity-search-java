@@ -22,6 +22,7 @@ import com.edduarte.similarity.converter.KShingles2SignatureConverter;
 import com.edduarte.similarity.converter.Signature2BandsConverter;
 import com.edduarte.similarity.hash.HashProvider.HashMethod;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -31,7 +32,7 @@ import java.util.concurrent.Future;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class LSHStringSimilarity implements StringSimilarity {
+public class LSHStringSimilarity extends StringSimilarity {
 
   protected final JaccardStringSimilarity jaccard;
 
@@ -57,17 +58,22 @@ public class LSHStringSimilarity implements StringSimilarity {
    * @param k    the length k of the shingles to generate
    */
   public LSHStringSimilarity(
-      ExecutorService exec,
+      String s1,
+      String s2,
       int b,
       int r,
       double s,
       HashMethod hash,
-      int k) {
+      int k,
+      ExecutorService exec) {
+    super(s1, s2);
+    Objects.requireNonNull(hash, "Hash method must not be null");
+    Objects.requireNonNull(exec, "Executor must not be null");
     // signature size is determined by a threshold S
     int R = (int) Math.ceil(Math.log(1.0 / b) / Math.log(s)) + 1;
     int signatureSize = R * b;
 
-    this.jaccard = new JaccardStringSimilarity(exec, k);
+    this.jaccard = new JaccardStringSimilarity(s1, s2, k, exec);
     this.sigp = new KShingles2SignatureConverter(hash, signatureSize);
     this.bandp = new Signature2BandsConverter(b, r);
     this.exec = exec;
@@ -75,8 +81,10 @@ public class LSHStringSimilarity implements StringSimilarity {
 
 
   @Override
-  public double calculate(String s1, String s2) {
-    return isCandidatePair(s1, s2) ? jaccard.calculate(s1, s2) : 0;
+  public double getAsDouble() {
+    String s1 = getFirst();
+    String s2 = getSecond();
+    return isCandidatePair(s1, s2) ? jaccard.getAsDouble() : 0;
   }
 
 
@@ -87,15 +95,17 @@ public class LSHStringSimilarity implements StringSimilarity {
           exec.submit(sigp.apply(pair.getShingles1()));
       Future<int[]> signatureFuture2 =
           exec.submit(sigp.apply(pair.getShingles2()));
-
       int[] signature1 = signatureFuture1.get();
       int[] signature2 = signatureFuture2.get();
+      signatureFuture1 = null;
+      signatureFuture2 = null;
 
       Future<int[]> bandsFuture1 = exec.submit(bandp.apply(signature1));
       Future<int[]> bandsFuture2 = exec.submit(bandp.apply(signature2));
-
       int[] bands1 = bandsFuture1.get();
       int[] bands2 = bandsFuture2.get();
+      bandsFuture1 = null;
+      bandsFuture2 = null;
 
       return Similarity.isCandidatePair(bands1, bands2);
 

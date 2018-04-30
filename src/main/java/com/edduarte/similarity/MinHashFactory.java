@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
@@ -17,18 +16,16 @@ import java.util.concurrent.Executors;
  */
 public final class MinHashFactory extends Factory {
 
-  static final MinHashFactory SINGLETON = new MinHashFactory();
+  private int k;
 
-  private final int k;
+  private int n;
 
-  private final int n;
+  private int sigSize;
 
-  private final int sigSize;
-
-  private final HashProvider.HashMethod h;
+  private HashProvider.HashMethod h;
 
 
-  private MinHashFactory() {
+  MinHashFactory() {
     super();
     // sensible defaults for common small strings (smaller than an email)
     // or small collections (between 10 to 40 elements)
@@ -39,42 +36,13 @@ public final class MinHashFactory extends Factory {
   }
 
 
-  private MinHashFactory(
-      int k,
-      int n,
-      int sigSize,
-      HashProvider.HashMethod h,
-      ExecutorService exec) {
-    super(exec);
-    this.k = k;
-    this.n = n;
-    this.sigSize = sigSize;
-    this.h = h;
-  }
-
-
-  public MinHashFactory with(
-      int shingleLength,
-      int elementCount,
-      int signatureSize,
-      HashProvider.HashMethod hashMethod,
-      ExecutorService executor) {
-    return new MinHashFactory(
-        shingleLength,
-        elementCount,
-        signatureSize,
-        hashMethod,
-        executor
-    );
-  }
-
-
   /**
    * Length of n-gram shingles that are used for comparison (used for
    * strings only).
    */
-  public MinHashFactory withShingleLength(int shingleLength) {
-    return new MinHashFactory(shingleLength, n, sigSize, h, exec);
+  public synchronized MinHashFactory withShingleLength(int shingleLength) {
+    this.k = shingleLength;
+    return this;
   }
 
 
@@ -84,8 +52,9 @@ public final class MinHashFactory extends Factory {
    * should be 7. If nothing is provided, this value is determined in
    * pre-processing.
    */
-  public MinHashFactory withNumberOfElements(int elementCount) {
-    return new MinHashFactory(k, elementCount, sigSize, h, exec);
+  public synchronized MinHashFactory withNumberOfElements(int elementCount) {
+    this.n = elementCount;
+    return this;
   }
 
 
@@ -93,8 +62,9 @@ public final class MinHashFactory extends Factory {
    * The size of the generated signatures, which are compared to determine
    * similarity.
    */
-  public MinHashFactory withSignatureSize(int signatureSize) {
-    return new MinHashFactory(k, n, signatureSize, h, exec);
+  public synchronized MinHashFactory withSignatureSize(int signatureSize) {
+    this.sigSize = signatureSize;
+    return this;
   }
 
 
@@ -102,8 +72,10 @@ public final class MinHashFactory extends Factory {
    * The hashing algorithm used to hash shingles to signatures (used for
    * strings only).
    */
-  public MinHashFactory withHashMethod(HashProvider.HashMethod hashMethod) {
-    return new MinHashFactory(k, n, sigSize, hashMethod, exec);
+  public synchronized MinHashFactory withHashMethod(
+      HashProvider.HashMethod hashMethod) {
+    this.h = hashMethod;
+    return this;
   }
 
 
@@ -112,47 +84,30 @@ public final class MinHashFactory extends Factory {
    * spawned. If nothing is provided then it launches a new executor with
    * the cached thread pool.
    */
-  public MinHashFactory withExecutor(ExecutorService executor) {
-    return new MinHashFactory(k, n, sigSize, h, executor);
+  public synchronized MinHashFactory withExecutor(ExecutorService executor) {
+    setExec(executor);
+    return this;
   }
 
 
-  public double of(String s1, String s2) {
-    ExecutorService e = exec;
-    boolean usingDefaultExec = false;
-    if (e == null || e.isShutdown()) {
-      e = Executors.newCachedThreadPool();
-      usingDefaultExec = true;
-    }
-    MinHashStringSimilarity j = new MinHashStringSimilarity(e, sigSize, h, k);
-    double index = j.calculate(s1, s2);
-    if (usingDefaultExec) {
-      closeExecutor();
-    }
-    return index;
+  @Override
+  StringSimilarity initStringSimilarityTask(
+      String s1, String s2, ExecutorService exec) {
+    return new MinHashStringSimilarity(s1, s2, sigSize, h, k, exec);
   }
 
 
-  public double of(
+  @Override
+  SetSimilarity initSetSimilarityTask(
       Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
-    ExecutorService e = exec;
-    boolean usingDefaultExec = false;
-    if (e == null || e.isShutdown()) {
-      e = Executors.newCachedThreadPool();
-      usingDefaultExec = true;
-    }
+      Collection<? extends Number> c2,
+      ExecutorService exec) {
     int nAux = n;
     if (nAux < 0) {
       Set<Number> unionSet = new HashSet<>(c1);
       unionSet.addAll(c2);
-      nAux = (int) unionSet.parallelStream().distinct().count();
+      nAux = (int) unionSet.stream().distinct().count();
     }
-    MinHashSetSimilarity j = new MinHashSetSimilarity(e, nAux, sigSize);
-    double index = j.calculate(c1, c2);
-    if (usingDefaultExec) {
-      closeExecutor();
-    }
-    return index;
+    return new MinHashSetSimilarity(c1, c2, nAux, sigSize, exec);
   }
 }

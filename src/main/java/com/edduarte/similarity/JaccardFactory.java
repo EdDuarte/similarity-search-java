@@ -5,7 +5,6 @@ import com.edduarte.similarity.internal.JaccardStringSimilarity;
 
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author Eduardo Duarte (<a href="mailto:hi@edduarte.com">hi@edduarte.com</a>)
@@ -14,12 +13,10 @@ import java.util.concurrent.Executors;
  */
 public final class JaccardFactory extends Factory {
 
-  static final JaccardFactory SINGLETON = new JaccardFactory();
-
-  private final int k;
+  private int k;
 
 
-  private JaccardFactory() {
+  JaccardFactory() {
     super();
     // sensible defaults for common small strings (smaller than an email)
     // or small collections (between 10 to 40 elements)
@@ -27,23 +24,13 @@ public final class JaccardFactory extends Factory {
   }
 
 
-  private JaccardFactory(int k, ExecutorService exec) {
-    super(exec);
-    this.k = k;
-  }
-
-
-  public JaccardFactory with(int shingleLength, ExecutorService executor) {
-    return new JaccardFactory(shingleLength, executor);
-  }
-
-
   /**
    * Length of n-gram shingles that are used for comparison (used for
    * strings only).
    */
-  public JaccardFactory withShingleLength(int shingleLength) {
-    return new JaccardFactory(shingleLength, exec);
+  public synchronized JaccardFactory withShingleLength(int shingleLength) {
+    this.k = shingleLength;
+    return this;
   }
 
 
@@ -51,31 +38,24 @@ public final class JaccardFactory extends Factory {
    * An executor where the kshingling tasks are spawned. If nothing is
    * provided then it launches a new executor with the cached thread pool.
    */
-  public JaccardFactory withExecutor(ExecutorService executor) {
-    return new JaccardFactory(k, executor);
+  public synchronized JaccardFactory withExecutor(ExecutorService executor) {
+    setExec(executor);
+    return this;
   }
 
 
-  public double of(String s1, String s2) {
-    ExecutorService e = exec;
-    boolean usingDefaultExec = false;
-    if (e == null || e.isShutdown()) {
-      e = Executors.newCachedThreadPool();
-      usingDefaultExec = true;
-    }
-    JaccardStringSimilarity j = new JaccardStringSimilarity(e, k);
-    double index = j.calculate(s1, s2);
-    if (usingDefaultExec) {
-      closeExecutor();
-    }
-    return index;
+  @Override
+  protected StringSimilarity initStringSimilarityTask(
+      String s1, String s2, ExecutorService exec) {
+    return new JaccardStringSimilarity(s1, s2, k, exec);
   }
 
 
-  public double of(
+  @Override
+  protected SetSimilarity initSetSimilarityTask(
       Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
-    JaccardSetSimilarity j = new JaccardSetSimilarity();
-    return j.calculate(c1, c2);
+      Collection<? extends Number> c2,
+      ExecutorService exec) {
+    return new JaccardSetSimilarity(c1, c2);
   }
 }

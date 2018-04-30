@@ -21,6 +21,7 @@ import com.edduarte.similarity.StringSimilarity;
 import com.edduarte.similarity.converter.KShingler;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -30,28 +31,36 @@ import java.util.concurrent.Future;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class JaccardStringSimilarity implements StringSimilarity {
-
-  protected final ExecutorService exec;
+public class JaccardStringSimilarity extends StringSimilarity {
 
   protected final KShingler kShingler;
+
+  protected final ExecutorService exec;
 
 
   /**
    * Instantiates a Similarity class for strings using the Jaccard algorithm.
    *
+   * @param k    the length k of the shingles to generate
    * @param exec the executor that will receive the concurrent shingle
    *             processing tasks
-   * @param k    the length k of the shingles to generate
    */
-  public JaccardStringSimilarity(ExecutorService exec, int k) {
-    this.exec = exec;
+  public JaccardStringSimilarity(
+      String s1,
+      String s2,
+      int k,
+      ExecutorService exec) {
+    super(s1, s2);
+    Objects.requireNonNull(exec, "Executor must not be null");
     this.kShingler = new KShingler(k);
+    this.exec = exec;
   }
 
 
   @Override
-  public double calculate(String s1, String s2) {
+  public double getAsDouble() {
+    String s1 = getFirst();
+    String s2 = getSecond();
     ShinglePair shingles = getShingles(s1, s2);
     return Similarity.jaccardIndex(
         shingles.getShingles1(),
@@ -71,6 +80,9 @@ public class JaccardStringSimilarity implements StringSimilarity {
     } catch (ExecutionException | InterruptedException ex) {
       String m = "There was a problem processing shingles.";
       throw new RuntimeException(m, ex);
+    } finally {
+      future1 = null;
+      future2 = null;
     }
   }
 
