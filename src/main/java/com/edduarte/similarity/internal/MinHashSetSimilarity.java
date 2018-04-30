@@ -32,41 +32,42 @@ import java.util.concurrent.Future;
  */
 public class MinHashSetSimilarity implements SetSimilarity {
 
-    private final Set2SignatureConverter p;
+  private final Set2SignatureConverter p;
 
-    private final ExecutorService exec;
+  private final ExecutorService exec;
 
 
-    /**
-     * Instantiates a Similarity class for number sets using the MinHashing
-     * algorithm.
-     *
-     * @param exec    the executor that will receive the concurrent shingle
-     *                processing tasks
-     * @param n       the total number of unique elements in both sets
-     * @param sigSize the length of the signature array to be generated
-     */
-    public MinHashSetSimilarity(ExecutorService exec, int n, int sigSize) {
-        this.exec = exec;
-        this.p = new Set2SignatureConverter(n, sigSize);
+  /**
+   * Instantiates a Similarity class for number sets using the MinHashing
+   * algorithm.
+   *
+   * @param exec    the executor that will receive the concurrent shingle
+   *                processing tasks
+   * @param n       the total number of unique elements in both sets
+   * @param sigSize the length of the signature array to be generated
+   */
+  public MinHashSetSimilarity(ExecutorService exec, int n, int sigSize) {
+    this.exec = exec;
+    this.p = new Set2SignatureConverter(n, sigSize);
+  }
+
+
+  @Override
+  public double calculate(
+      Collection<? extends Number> c1,
+      Collection<? extends Number> c2) {
+    Future<int[]> signatureFuture1 = exec.submit(p.apply(c1));
+    Future<int[]> signatureFuture2 = exec.submit(p.apply(c2));
+
+    try {
+      int[] signature1 = signatureFuture1.get();
+      int[] signature2 = signatureFuture2.get();
+
+      return Similarity.signatureIndex(signature1, signature2);
+
+    } catch (ExecutionException | InterruptedException ex) {
+      String m = "There was a problem processing set signatures.";
+      throw new RuntimeException(m, ex);
     }
-
-
-    @Override
-    public double calculate(Collection<? extends Number> c1,
-                            Collection<? extends Number> c2) {
-        Future<int[]> signatureFuture1 = exec.submit(p.apply(c1));
-        Future<int[]> signatureFuture2 = exec.submit(p.apply(c2));
-
-        try {
-            int[] signature1 = signatureFuture1.get();
-            int[] signature2 = signatureFuture2.get();
-
-            return Similarity.signatureIndex(signature1, signature2);
-
-        } catch (ExecutionException | InterruptedException ex) {
-            String m = "There was a problem processing set signatures.";
-            throw new RuntimeException(m, ex);
-        }
-    }
+  }
 }

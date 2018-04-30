@@ -34,56 +34,58 @@ import java.util.concurrent.Future;
  */
 public class MinHashStringSimilarity implements StringSimilarity {
 
-    private final ExecutorService exec;
+  private final ExecutorService exec;
 
-    private final JaccardStringSimilarity jaccard;
+  private final JaccardStringSimilarity jaccard;
 
-    private final KShingles2SignatureConverter p;
+  private final KShingles2SignatureConverter p;
 
 
-    /**
-     * Instantiates a Similarity class for strings using the MinHashing
-     * algorithm.
-     *
-     * @param exec    the executor that will receive the concurrent shingle
-     *                processing tasks
-     * @param sigSize the length of the signature array to be generated
-     * @param hash    the hash method to use when hashing shingles to signatures
-     * @param k       the length k of the shingles to generate
-     */
-    public MinHashStringSimilarity(ExecutorService exec, int sigSize,
-                                   HashMethod hash, int k) {
-        this.jaccard = new JaccardStringSimilarity(exec, k);
-        this.p = new KShingles2SignatureConverter(hash, sigSize);
-        this.exec = exec;
+  /**
+   * Instantiates a Similarity class for strings using the MinHashing
+   * algorithm.
+   *
+   * @param exec    the executor that will receive the concurrent shingle
+   *                processing tasks
+   * @param sigSize the length of the signature array to be generated
+   * @param hash    the hash method to use when hashing shingles to signatures
+   * @param k       the length k of the shingles to generate
+   */
+  public MinHashStringSimilarity(
+      ExecutorService exec, int sigSize,
+      HashMethod hash, int k) {
+    this.jaccard = new JaccardStringSimilarity(exec, k);
+    this.p = new KShingles2SignatureConverter(hash, sigSize);
+    this.exec = exec;
+  }
+
+
+  @Override
+  public double calculate(String s1, String s2) {
+    JaccardStringSimilarity.ShinglePair p = jaccard.getShingles(s1, s2);
+    int[][] signatures = getSignatures(p.shingles1, p.shingles2);
+    return Similarity.signatureIndex(signatures[0], signatures[1]);
+  }
+
+
+  private int[][] getSignatures(
+      List<CharSequence> shingles1,
+      List<CharSequence> shingles2) {
+    Future<int[]> signatureFuture1 = exec.submit(p.apply(shingles1));
+    Future<int[]> signatureFuture2 = exec.submit(p.apply(shingles2));
+
+    try {
+      int[] signature1 = signatureFuture1.get();
+      int[] signature2 = signatureFuture2.get();
+      int signatureSize = signature1.length;
+      int[][] result = new int[2][signatureSize];
+      result[0] = signature1;
+      result[1] = signature2;
+      return result;
+
+    } catch (ExecutionException | InterruptedException ex) {
+      String m = "There was a problem processing shingle signatures.";
+      throw new RuntimeException(m, ex);
     }
-
-
-    @Override
-    public double calculate(String s1, String s2) {
-        JaccardStringSimilarity.ShinglePair p = jaccard.getShingles(s1, s2);
-        int[][] signatures = getSignatures(p.shingles1, p.shingles2);
-        return Similarity.signatureIndex(signatures[0], signatures[1]);
-    }
-
-
-    private int[][] getSignatures(List<CharSequence> shingles1,
-                                  List<CharSequence> shingles2) {
-        Future<int[]> signatureFuture1 = exec.submit(p.apply(shingles1));
-        Future<int[]> signatureFuture2 = exec.submit(p.apply(shingles2));
-
-        try {
-            int[] signature1 = signatureFuture1.get();
-            int[] signature2 = signatureFuture2.get();
-            int signatureSize = signature1.length;
-            int[][] result = new int[2][signatureSize];
-            result[0] = signature1;
-            result[1] = signature2;
-            return result;
-
-        } catch (ExecutionException | InterruptedException ex) {
-            String m = "There was a problem processing shingle signatures.";
-            throw new RuntimeException(m, ex);
-        }
-    }
+  }
 }

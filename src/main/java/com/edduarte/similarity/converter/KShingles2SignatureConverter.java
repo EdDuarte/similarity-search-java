@@ -33,67 +33,68 @@ import java.util.stream.Collectors;
  * @since 0.0.1
  */
 public class KShingles2SignatureConverter
-        implements Function<List<CharSequence>, Callable<int[]>> {
+    implements Function<List<CharSequence>, Callable<int[]>> {
+
+  private final HashMethod hash;
+
+  private final int sigSize;
+
+
+  public KShingles2SignatureConverter(HashMethod hash, int sigSize) {
+    this.hash = hash;
+    this.sigSize = sigSize;
+  }
+
+
+  @Override
+  public Callable<int[]> apply(List<CharSequence> shingles) {
+    return new SignatureCallable(shingles, hash, sigSize);
+  }
+
+
+  private class SignatureCallable implements Callable<int[]> {
+
+    private final List<CharSequence> shingles;
 
     private final HashMethod hash;
 
     private final int sigSize;
 
 
-    public KShingles2SignatureConverter(HashMethod hash, int sigSize) {
-        this.hash = hash;
-        this.sigSize = sigSize;
+    private SignatureCallable(
+        List<CharSequence> shingles,
+        HashMethod hash,
+        int sigSize) {
+      this.shingles = shingles;
+      this.hash = hash;
+      this.sigSize = sigSize;
     }
 
 
     @Override
-    public Callable<int[]> apply(List<CharSequence> shingles) {
-        return new SignatureCallable(shingles, hash, sigSize);
-    }
+    public int[] call() {
+      int[] sig = new int[sigSize];
 
+      for (int i = 0; i < sigSize; i++) {
+        sig[i] = Integer.MAX_VALUE;
+      }
 
-    private class SignatureCallable implements Callable<int[]> {
+      List<String> aux = shingles.parallelStream()
+          .map(CharSequence::toString)
+          .collect(Collectors.toList());
 
-        private final List<CharSequence> shingles;
+      Collections.sort(aux);
 
-        private final HashMethod hash;
-
-        private final int sigSize;
-
-
-        private SignatureCallable(List<CharSequence> shingles,
-                                  HashMethod hash,
-                                  int sigSize) {
-            this.shingles = shingles;
-            this.hash = hash;
-            this.sigSize = sigSize;
+      for (final String s : aux) {
+        byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
+        int[] hash = this.hash.getHashFunction()
+            .hash(bytes, Integer.MAX_VALUE, sigSize);
+        for (int i = 0; i < sigSize; i++) {
+          sig[i] = Math.min(sig[i], hash[i]);
         }
+      }
 
-
-        @Override
-        public int[] call() {
-            int[] sig = new int[sigSize];
-
-            for (int i = 0; i < sigSize; i++) {
-                sig[i] = Integer.MAX_VALUE;
-            }
-
-            List<String> aux = shingles.parallelStream()
-                    .map(CharSequence::toString)
-                    .collect(Collectors.toList());
-
-            Collections.sort(aux);
-
-            for (final String s : aux) {
-                byte[] bytes = s.getBytes(Charset.forName("UTF-8"));
-                int[] hash = this.hash.getHashFunction()
-                        .hash(bytes, Integer.MAX_VALUE, sigSize);
-                for (int i = 0; i < sigSize; i++) {
-                    sig[i] = Math.min(sig[i], hash[i]);
-                }
-            }
-
-            return sig;
-        }
+      return sig;
     }
+  }
 }

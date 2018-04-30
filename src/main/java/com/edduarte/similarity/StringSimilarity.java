@@ -7,6 +7,6 @@ package com.edduarte.similarity;
  */
 public interface StringSimilarity extends Similarity<String> {
 
-    @Override
-    double calculate(String t1, String t2);
+  @Override
+  double calculate(String t1, String t2);
 }

@@ -7,9 +7,11 @@ import java.util.Collection;
  * @version 0.0.1
  * @since 0.0.1
  */
-public interface SetSimilarity extends Similarity<Collection<? extends Number>> {
+public interface SetSimilarity
+    extends Similarity<Collection<? extends Number>> {
 
-    @Override
-    double calculate(Collection<? extends Number> t1,
-                     Collection<? extends Number> t2);
+  @Override
+  double calculate(
+      Collection<? extends Number> t1,
+      Collection<? extends Number> t2);
 }

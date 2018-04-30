@@ -31,24 +31,25 @@ import java.util.Set;
 public class JaccardSetSimilarity implements SetSimilarity {
 
 
-    /**
-     * Instantiates a Similarity class for number sets using the Jaccard
-     * algorithm.
-     */
-    public JaccardSetSimilarity() {
-    }
+  /**
+   * Instantiates a Similarity class for number sets using the Jaccard
+   * algorithm.
+   */
+  public JaccardSetSimilarity() {
+  }
 
 
-    public double calculate(Collection<? extends Number> c1,
-                            Collection<? extends Number> c2) {
-        Set<Number> intersectionSet = new HashSet<>();
-        for (Number number : c1) {
-            if (c2.contains(number)) {
-                intersectionSet.add(number);
-            }
-        }
-        Set<Number> unionSet = new HashSet<>(c1);
-        unionSet.addAll(c2);
-        return Similarity.jaccardIndex(intersectionSet.size(), unionSet.size());
+  public double calculate(
+      Collection<? extends Number> c1,
+      Collection<? extends Number> c2) {
+    Set<Number> intersectionSet = new HashSet<>();
+    for (Number number : c1) {
+      if (c2.contains(number)) {
+        intersectionSet.add(number);
+      }
     }
+    Set<Number> unionSet = new HashSet<>(c1);
+    unionSet.addAll(c2);
+    return Similarity.jaccardIndex(intersectionSet.size(), unionSet.size());
+  }
 }
