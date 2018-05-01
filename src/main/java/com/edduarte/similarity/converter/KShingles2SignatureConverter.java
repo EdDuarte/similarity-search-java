@@ -16,7 +16,7 @@
 
 package com.edduarte.similarity.converter;
 
-import com.edduarte.similarity.hash.HashProvider.HashMethod;
+import orestes.bloomfilter.HashProvider.HashMethod;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public final class KShingles2SignatureConverter
 
   @Override
   public Callable<int[]> apply(List<CharSequence> shingles) {
-    return new SignatureCallable(new ArrayList<>(shingles), hash, sigSize);
+    return new SignatureCallable(shingles, hash, sigSize);
   }
 
 

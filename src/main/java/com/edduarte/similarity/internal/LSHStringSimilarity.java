@@ -20,7 +20,7 @@ import com.edduarte.similarity.Similarity;
 import com.edduarte.similarity.StringSimilarity;
 import com.edduarte.similarity.converter.KShingles2SignatureConverter;
 import com.edduarte.similarity.converter.Signature2BandsConverter;
-import com.edduarte.similarity.hash.HashProvider.HashMethod;
+import orestes.bloomfilter.HashProvider.HashMethod;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;

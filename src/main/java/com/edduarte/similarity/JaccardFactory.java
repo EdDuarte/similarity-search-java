@@ -4,6 +4,7 @@ import com.edduarte.similarity.internal.JaccardSetSimilarity;
 import com.edduarte.similarity.internal.JaccardStringSimilarity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -45,14 +46,14 @@ public final class JaccardFactory extends Factory {
 
 
   @Override
-  protected StringSimilarity initStringSimilarityTask(
+  StringSimilarity initStringSimilarityTask(
       String s1, String s2, ExecutorService exec) {
     return new JaccardStringSimilarity(s1, s2, k, exec);
   }
 
 
   @Override
-  protected SetSimilarity initSetSimilarityTask(
+  SetSimilarity initSetSimilarityTask(
       Collection<? extends Number> c1,
       Collection<? extends Number> c2,
       ExecutorService exec) {

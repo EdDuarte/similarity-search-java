@@ -78,8 +78,15 @@ public final class Set2SignatureConverter
 
 
   @Override
-  public Callable<int[]> apply(Collection<? extends Number> set) {
-    return new HashCallable(n, sigSize, a, b, new ArrayList<>(set));
+  public Callable<int[]> apply(Collection<? extends Number> c) {
+    List<? extends Number> list;
+    if (c instanceof List) {
+      list = (List) c;
+    } else {
+      list = new ArrayList<>(c);
+    }
+    list.sort(Comparator.comparingLong(Number::longValue));
+    return new HashCallable(n, sigSize, a, b, list);
   }
 
 
@@ -95,7 +102,7 @@ public final class Set2SignatureConverter
 
     private final int[] b;
 
-    private final List<? extends Number> list;
+    private final List<? extends Number> sortedList;
 
 
     private HashCallable(
@@ -103,12 +110,12 @@ public final class Set2SignatureConverter
         int sigSize,
         int[] a,
         int[] b,
-        List<? extends Number> list) {
+        List<? extends Number> sortedList) {
       this.n = n;
       this.sigSize = sigSize;
       this.a = a;
       this.b = b;
-      this.list = list;
+      this.sortedList = sortedList;
     }
 
 
@@ -120,9 +127,7 @@ public final class Set2SignatureConverter
         signature[i] = Integer.MAX_VALUE;
       }
 
-      list.sort(Comparator.comparingLong(Number::longValue));
-
-      for (final Number x : list) {
+      for (final Number x : sortedList) {
         for (int i = 0; i < sigSize; i++) {
           signature[i] = Math.min(signature[i], universalHashing(i, x));
         }

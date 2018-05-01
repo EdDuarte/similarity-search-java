@@ -1,6 +1,8 @@
 package com.edduarte.similarity;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
@@ -20,7 +22,7 @@ abstract class Factory {
   }
 
 
-  void setExec(ExecutorService exec) {
+  final void setExec(ExecutorService exec) {
     this.exec = exec;
   }
 
@@ -64,12 +66,14 @@ abstract class Factory {
   public synchronized final double of(
       Collection<? extends Number> c1,
       Collection<? extends Number> c2) {
+    List<? extends Number> l1 = new ArrayList<>(c1);
+    List<? extends Number> l2 = new ArrayList<>(c2);
     SetSimilarity task;
     if (exec != null && !exec.isShutdown()) {
-      task = initSetSimilarityTask(c1, c2, exec);
+      task = initSetSimilarityTask(l1, l2, exec);
     } else {
       ForkJoinPool e = ForkJoinPool.commonPool();
-      task = initSetSimilarityTask(c1, c2, e);
+      task = initSetSimilarityTask(l1, l2, e);
     }
     return task.getAsDouble();
   }
@@ -78,12 +82,14 @@ abstract class Factory {
   public synchronized final CompletableFuture<Double> ofAsync(
       Collection<? extends Number> c1,
       Collection<? extends Number> c2) {
+    List<? extends Number> l1 = new ArrayList<>(c1);
+    List<? extends Number> l2 = new ArrayList<>(c2);
     if (exec != null && !exec.isShutdown()) {
-      SetSimilarity task = initSetSimilarityTask(c1, c2, exec);
+      SetSimilarity task = initSetSimilarityTask(l1, l2, exec);
       return CompletableFuture.supplyAsync(task, exec);
     } else {
       ForkJoinPool e = ForkJoinPool.commonPool();
-      SetSimilarity task = initSetSimilarityTask(c1, c2, e);
+      SetSimilarity task = initSetSimilarityTask(l1, l2, e);
       return CompletableFuture.supplyAsync(task);
     }
   }

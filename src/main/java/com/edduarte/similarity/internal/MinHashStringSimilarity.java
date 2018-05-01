@@ -20,7 +20,7 @@ package com.edduarte.similarity.internal;
 import com.edduarte.similarity.Similarity;
 import com.edduarte.similarity.StringSimilarity;
 import com.edduarte.similarity.converter.KShingles2SignatureConverter;
-import com.edduarte.similarity.hash.HashProvider.HashMethod;
+import orestes.bloomfilter.HashProvider.HashMethod;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,18 +46,18 @@ public class MinHashStringSimilarity extends StringSimilarity {
    * Instantiates a Similarity class for strings using the MinHashing
    * algorithm.
    *
-   * @param exec    the executor that will receive the concurrent shingle
-   *                processing tasks
+   * @param k       the length k of the shingles to generate
    * @param sigSize the length of the signature array to be generated
    * @param hash    the hash method to use when hashing shingles to signatures
-   * @param k       the length k of the shingles to generate
+   * @param exec    the executor that will receive the concurrent shingle
+*                processing tasks
    */
   public MinHashStringSimilarity(
       String s1,
       String s2,
+      int k,
       int sigSize,
       HashMethod hash,
-      int k,
       ExecutorService exec) {
     super(s1, s2);
     Objects.requireNonNull(hash, "Hash method must not be null");

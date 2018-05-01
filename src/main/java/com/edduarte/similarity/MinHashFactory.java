@@ -1,6 +1,6 @@
 package com.edduarte.similarity;
 
-import com.edduarte.similarity.hash.HashProvider;
+import orestes.bloomfilter.HashProvider;
 import com.edduarte.similarity.internal.MinHashSetSimilarity;
 import com.edduarte.similarity.internal.MinHashStringSimilarity;
 
@@ -93,7 +93,7 @@ public final class MinHashFactory extends Factory {
   @Override
   StringSimilarity initStringSimilarityTask(
       String s1, String s2, ExecutorService exec) {
-    return new MinHashStringSimilarity(s1, s2, sigSize, h, k, exec);
+    return new MinHashStringSimilarity(s1, s2, k, sigSize, h, exec);
   }
 
 

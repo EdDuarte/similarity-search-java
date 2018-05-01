@@ -22,7 +22,9 @@ import com.edduarte.similarity.converter.Set2SignatureConverter;
 import com.edduarte.similarity.converter.Signature2BandsConverter;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
