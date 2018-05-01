@@ -195,7 +195,7 @@ the result for non-candidate pairs will be non-deterministic.
 
 So far the code samples have shown how to use the builder pattern available in
 the Similarity interface. However, you can instead instantiate the internal
-classes that implement the Similarity interface instead.
+classes that implement the Similarity interface.
 
 ```java
 
@@ -225,7 +225,7 @@ double similarity = setSimilarity.getAsDouble();
 Do note that while the Similarity builder pattern ensures that the provided
 number sets are copied, so that the computation of the similarity index is not
 affected by external threads that perform changes to the original sets
-simultaneously, these internal classes do **NOT**, and you should ensure this
+in parallel, these internal classes do **NOT**, and you should ensure this
 condition yourself. This is intentional, so that these internal classes provide
 a higher performance variant of Similarity instantiation.
 
