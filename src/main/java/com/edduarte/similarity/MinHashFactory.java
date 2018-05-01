@@ -1,8 +1,8 @@
 package com.edduarte.similarity;
 
 import orestes.bloomfilter.HashProvider;
-import com.edduarte.similarity.internal.MinHashSetSimilarity;
-import com.edduarte.similarity.internal.MinHashStringSimilarity;
+import com.edduarte.similarity.impl.MinHashSetSimilarity;
+import com.edduarte.similarity.impl.MinHashStringSimilarity;
 
 import java.util.Collection;
 import java.util.HashSet;

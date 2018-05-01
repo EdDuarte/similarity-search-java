@@ -1,7 +1,7 @@
 package com.edduarte.similarity;
 
-import com.edduarte.similarity.internal.LSHSetSimilarity;
-import com.edduarte.similarity.internal.LSHStringSimilarity;
+import com.edduarte.similarity.impl.LSHSetSimilarity;
+import com.edduarte.similarity.impl.LSHStringSimilarity;
 import orestes.bloomfilter.HashProvider;
 
 import java.util.Collection;
@@ -116,7 +116,7 @@ public final class LSHFactory extends Factory {
   @Override
   StringSimilarity initStringSimilarityTask(
       String s1, String s2, ExecutorService exec) {
-    return new LSHStringSimilarity(s1, s2, b, r, s, h, k, exec);
+    return new LSHStringSimilarity(s1, s2, k, b, r, s, h, exec);
   }
 
 

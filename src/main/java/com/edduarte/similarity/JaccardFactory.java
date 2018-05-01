@@ -1,10 +1,9 @@
 package com.edduarte.similarity;
 
-import com.edduarte.similarity.internal.JaccardSetSimilarity;
-import com.edduarte.similarity.internal.JaccardStringSimilarity;
+import com.edduarte.similarity.impl.JaccardSetSimilarity;
+import com.edduarte.similarity.impl.JaccardStringSimilarity;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**

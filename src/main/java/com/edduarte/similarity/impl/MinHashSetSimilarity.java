@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.edduarte.similarity.internal;
+package com.edduarte.similarity.impl;
 
 import com.edduarte.similarity.SetSimilarity;
 import com.edduarte.similarity.Similarity;

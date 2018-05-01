@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.edduarte.similarity.internal;
+package com.edduarte.similarity.impl;
 
-import com.edduarte.similarity.SetSimilarity;
 import com.edduarte.similarity.Similarity;
-import com.edduarte.similarity.converter.Set2SignatureConverter;
+import com.edduarte.similarity.StringSimilarity;
+import com.edduarte.similarity.converter.KShingles2SignatureConverter;
 import com.edduarte.similarity.converter.Signature2BandsConverter;
+import orestes.bloomfilter.HashProvider.HashMethod;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -34,11 +32,11 @@ import java.util.concurrent.Future;
  * @version 0.0.1
  * @since 0.0.1
  */
-public class LSHSetSimilarity extends SetSimilarity {
+public class LSHStringSimilarity extends StringSimilarity {
 
-  protected final JaccardSetSimilarity jaccard;
+  protected final JaccardStringSimilarity jaccard;
 
-  protected final Set2SignatureConverter sigp;
+  protected final KShingles2SignatureConverter sigp;
 
   protected final Signature2BandsConverter bandp;
 
@@ -46,33 +44,37 @@ public class LSHSetSimilarity extends SetSimilarity {
 
 
   /**
-   * Instantiates a Similarity class for number sets using the LSH algorithm.
+   * Instantiates a Similarity class for strings using the LSH algorithm.
    *
-   * @param exec the executor that will receive the concurrent signature and
-   *             band processing tasks
-   * @param n    the total number of unique elements in both sets
+   * @param k    the length k of the shingles to generate
    * @param b    the number of bands
    * @param r    the number of rows
    * @param s    the threshold (value between 0.0 and 1.0) that balances the
-   *             trade-off between the number of false positives and false
-   *             negatives. A sensible threshold is 0.5, so we have a equal
-   *             number of false positives and false negatives.
+*             trade-off between the number of false positives and false
+*             negatives. A sensible threshold is 0.5, so we have a equal
+*             number of false positives and false negatives.
+   * @param hash the hash method to use when hashing shingles to signatures
+   * @param exec the executor that will receive the concurrent signature and
+*             band processing tasks
    */
-  public LSHSetSimilarity(
-      Collection<? extends Number> c1,
-      Collection<? extends Number> c2,
-      int n,
+  public LSHStringSimilarity(
+      String s1,
+      String s2,
+      int k,
       int b,
       int r,
       double s,
+      HashMethod hash,
       ExecutorService exec) {
-    super(c1, c2);
+    super(s1, s2);
+    Objects.requireNonNull(hash, "Hash method must not be null");
     Objects.requireNonNull(exec, "Executor must not be null");
     // signature size is determined by a threshold S
     int R = (int) Math.ceil(Math.log(1.0 / b) / Math.log(s)) + 1;
-    int sigSize = R * b;
-    this.jaccard = new JaccardSetSimilarity(c1, c2);
-    this.sigp = new Set2SignatureConverter(n, sigSize);
+    int signatureSize = R * b;
+
+    this.jaccard = new JaccardStringSimilarity(s1, s2, k, exec);
+    this.sigp = new KShingles2SignatureConverter(hash, signatureSize);
     this.bandp = new Signature2BandsConverter(b, r);
     this.exec = exec;
   }
@@ -80,18 +82,19 @@ public class LSHSetSimilarity extends SetSimilarity {
 
   @Override
   public double getAsDouble() {
-    Collection<? extends Number> c1 = getFirst();
-    Collection<? extends Number> c2 = getSecond();
-    return isCandidatePair(c1, c2) ? jaccard.getAsDouble() : 0;
+    String s1 = getFirst();
+    String s2 = getSecond();
+    return isCandidatePair(s1, s2) ? jaccard.getAsDouble() : 0;
   }
 
 
-  protected boolean isCandidatePair(
-      Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
+  public boolean isCandidatePair(String s1, String s2) {
+    JaccardStringSimilarity.ShinglePair pair = jaccard.getShingles(s1, s2);
     try {
-      Future<int[]> signatureFuture1 = exec.submit(sigp.apply(c1));
-      Future<int[]> signatureFuture2 = exec.submit(sigp.apply(c2));
+      Future<int[]> signatureFuture1 =
+          exec.submit(sigp.apply(pair.getShingles1()));
+      Future<int[]> signatureFuture2 =
+          exec.submit(sigp.apply(pair.getShingles2()));
       int[] signature1 = signatureFuture1.get();
       int[] signature2 = signatureFuture2.get();
       signatureFuture1 = null;

@@ -44,9 +44,8 @@ double similarity = Similarity.jaccard().of(string1, string2);
 double similarity = Similarity.jaccard().of(set1, set2);
 ```
 
-This will return a similarity coefficient, a value between 0 and 1
-where 1 means the two strings or sets are exactly equal and
-where 0 means they are disjoint.
+This will return a similarity coefficient, a value between 0 and 1 where 1 means
+the two strings or sets are exactly equal and where 0 means they are disjoint.
 
 In the case of string similarity, you might need to set an appropriate shingle
 length based on the size of your strings. A shingle length of 2 is used by
@@ -64,9 +63,9 @@ double similarity = Similarity.jaccard()
 Jaccard is an exact approach, so this will always return the most accurate,
 gold-standard result but at a slower speed than other approaches. Jaccard
 similarity should be enough for most use-cases, but if you're dealing with a
-massive number of operations in parallel (big data, data-streams), you should
-go for a probabilistic approach like Minhashing or LSH, detailed in the
-"Advanced" section below.
+massive number of operations in parallel (big data, data-streams), you should go
+for a probabilistic approach like Minhashing or LSH, detailed in the "Advanced"
+section below.
 
 
 ## Advanced
@@ -194,20 +193,55 @@ the result for non-candidate pairs will be non-deterministic.
 
 ### Internal classes
 
-So far the code samples have shown how to use the builder paradigm available in
-the Similarity interface. However, you can instantiate a number of classes that
-correspond to each step of the implemented similarity search algorithms, and use
-them in your application at your own accord. Each of the converter classes below
-returns a result that could, for example, be stored in a database / cache for
-later use.
+So far the code samples have shown how to use the builder pattern available in
+the Similarity interface. However, you can instead instantiate the internal
+classes that implement the Similarity interface instead.
 
 ```java
 
-// initialize example values and converter classes
+// example values
+int shingleLength = 2;
+int signatureSize = 100;
+HashMethod hashMethod = HashMethod.Murmur3;
+int n = 5;
+int bands = 20;
+int rows = 5;
+double threshold = 0.5;
+
+// string similarity
+StringSimilarity stringSimilarity = new JaccardStringSimilarity(s1, s2, shingleLength, executor);
+StringSimilarity stringSimilarity = new MinHashStringSimilarity(s1, s2, shingleLength, signatureSize, hashMethod, executor);
+StringSimilarity stringSimilarity = new LSHStringSimilarity(s1, s2, shingleLength, bands, rows, threshold, hashMethod, executor);
+double similarity = stringSimilarity.getAsDouble();
+
+// set similarity
+SetSimilarity setSimilarity = new JaccardSetSimilarity(c1, c2);
+SetSimilarity setSimilarity = new MinHashSetSimilarity(c1, c2, n, signatureSize, executor);
+SetSimilarity setSimilarity = new LSHSetSimilarity(c1, c2, n, bands, rows, threshold, executor);
+double similarity = setSimilarity.getAsDouble();
+
+```
+
+Do note that while the Similarity builder pattern ensures that the provided
+number sets are copied, so that the computation of the similarity index is not
+affected by external threads that perform changes to the original sets
+simultaneously, these internal classes do **NOT**, and you should ensure this
+condition yourself. This is intentional, so that these internal classes provide
+a higher performance variant of Similarity instantiation.
+
+You can also use a number of classes that correspond to each step of the
+implemented similarity search algorithms, and use them in your application at
+your own accord. Each of the converter classes below returns a result that
+could, for example, be stored in a database / cache for later use.
+
+```java
+
+// example values
 String exampleString = "example string";
 Set<Integer> exampleSet = Set.of(1, 2, 3, 4, 5);
 int shingleLength = 2;
 int signatureSize = 100;
+HashMethod hashMethod = HashMethod.Murmur3;
 int n = 5;
 int bands = 20;
 int rows = 5;
@@ -221,7 +255,7 @@ double stringSimilarity = Similarity.jaccardIndex(shingles1, shingles2);
 double setSimilarity    = Similarity.jaccardIndex(exampleSet1, exampleSet2);
 
 // get signatures from shingles
-KShingles2SignatureConverter c2 = new KShingles2SignatureConverter(HashMethod.Murmur3, signatureSize);
+KShingles2SignatureConverter c2 = new KShingles2SignatureConverter(hashMethod, signatureSize);
 int[] stringSignature = c2.apply(shingles).call();
 
 // generate a universal-hash signature for sets
@@ -246,7 +280,8 @@ boolean isCandidatePair = Similarity.isCandidatePair(setBands1, setBands2);
 Note that all of the Converter classes above return a Callable, which can be
 submitted into any Executor in order to trigger multiple conversion calls in
 parallel. Below is an example of how to obtain the string similarity between two
-strings, with k-shingling for both strings being executed in parallel:
+strings, with k-shingling for both strings being forked as parallel tasks and
+then joined to compute the Jaccard index:
 
 ```
 KShingler kShingler = new KShingler(shingleLength);
