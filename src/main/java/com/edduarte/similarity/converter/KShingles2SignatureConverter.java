@@ -19,7 +19,6 @@ package com.edduarte.similarity.converter;
 import orestes.bloomfilter.HashProvider.HashMethod;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;

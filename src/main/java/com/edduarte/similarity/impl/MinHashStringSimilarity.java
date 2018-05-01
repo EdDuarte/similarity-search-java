@@ -50,7 +50,7 @@ public class MinHashStringSimilarity extends StringSimilarity {
    * @param sigSize the length of the signature array to be generated
    * @param hash    the hash method to use when hashing shingles to signatures
    * @param exec    the executor that will receive the concurrent shingle
-*                processing tasks
+   *                processing tasks
    */
   public MinHashStringSimilarity(
       String s1,

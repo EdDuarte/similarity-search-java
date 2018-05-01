@@ -50,12 +50,12 @@ public class LSHStringSimilarity extends StringSimilarity {
    * @param b    the number of bands
    * @param r    the number of rows
    * @param s    the threshold (value between 0.0 and 1.0) that balances the
-*             trade-off between the number of false positives and false
-*             negatives. A sensible threshold is 0.5, so we have a equal
-*             number of false positives and false negatives.
+   *             trade-off between the number of false positives and false
+   *             negatives. A sensible threshold is 0.5, so we have a equal
+   *             number of false positives and false negatives.
    * @param hash the hash method to use when hashing shingles to signatures
    * @param exec the executor that will receive the concurrent signature and
-*             band processing tasks
+   *             band processing tasks
    */
   public LSHStringSimilarity(
       String s1,
