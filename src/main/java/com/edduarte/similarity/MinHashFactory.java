@@ -37,8 +37,7 @@ public final class MinHashFactory extends Factory {
 
 
   /**
-   * Length of n-gram shingles that are used for comparison (used for
-   * strings only).
+   * Length of n-gram shingles that are used for comparison (used for strings only).
    */
   public synchronized MinHashFactory withShingleLength(int shingleLength) {
     this.k = shingleLength;
@@ -47,10 +46,9 @@ public final class MinHashFactory extends Factory {
 
 
   /**
-   * Number of unique elements in both sets (used for sets only). For
-   * example, if set1=[4, 5, 6, 7, 8] and set2=[7, 8, 9, 10], this value
-   * should be 7. If nothing is provided, this value is determined in
-   * pre-processing.
+   * Number of unique elements in both sets (used for sets only). For example, if set1=[4, 5, 6, 7,
+   * 8] and set2=[7, 8, 9, 10], this value should be 7. If nothing is provided, this value is
+   * determined in pre-processing.
    */
   public synchronized MinHashFactory withNumberOfElements(int elementCount) {
     this.n = elementCount;
@@ -59,8 +57,7 @@ public final class MinHashFactory extends Factory {
 
 
   /**
-   * The size of the generated signatures, which are compared to determine
-   * similarity.
+   * The size of the generated signatures, which are compared to determine similarity.
    */
   public synchronized MinHashFactory withSignatureSize(int signatureSize) {
     this.sigSize = signatureSize;
@@ -69,8 +66,7 @@ public final class MinHashFactory extends Factory {
 
 
   /**
-   * The hashing algorithm used to hash shingles to signatures (used for
-   * strings only).
+   * The hashing algorithm used to hash shingles to signatures (used for strings only).
    */
   public synchronized MinHashFactory withHashMethod(
       HashProvider.HashMethod hashMethod) {
@@ -80,9 +76,8 @@ public final class MinHashFactory extends Factory {
 
 
   /**
-   * An executor where the kshingling and signature processing tasks are
-   * spawned. If nothing is provided then it launches a new executor with
-   * the cached thread pool.
+   * An executor where the kshingling and signature processing tasks are spawned. If nothing is
+   * provided then it launches a new executor with the cached thread pool.
    */
   public synchronized MinHashFactory withExecutor(ExecutorService executor) {
     setExec(executor);

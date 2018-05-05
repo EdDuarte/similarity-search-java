@@ -28,7 +28,9 @@ abstract class Factory {
 
 
   abstract StringSimilarity initStringSimilarityTask(
-      String s1, String s2, ExecutorService exec);
+      String s1,
+      String s2,
+      ExecutorService exec);
 
 
   abstract SetSimilarity initSetSimilarityTask(
@@ -49,9 +51,7 @@ abstract class Factory {
   }
 
 
-  public synchronized final CompletableFuture<Double> ofAsync(
-      String s1,
-      String s2) {
+  public synchronized final CompletableFuture<Double> ofAsync(String s1, String s2) {
     if (exec != null && !exec.isShutdown()) {
       StringSimilarity task = initStringSimilarityTask(s1, s2, exec);
       return CompletableFuture.supplyAsync(task, exec);

@@ -31,8 +31,7 @@ import java.util.Set;
 public class JaccardSetSimilarity extends SetSimilarity {
 
   /**
-   * Instantiates a Similarity class for number sets using the Jaccard
-   * algorithm.
+   * Instantiates a Similarity class for number sets using the Jaccard algorithm.
    */
   public JaccardSetSimilarity(
       Collection<? extends Number> c1,

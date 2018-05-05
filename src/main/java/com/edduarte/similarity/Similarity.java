@@ -13,10 +13,9 @@ import java.util.function.Supplier;
  * @version 0.0.1
  * @since 0.0.1
  */
-public interface Similarity<T>
-    extends DoubleSupplier, BooleanSupplier, Supplier<Double> {
+public interface Similarity<T> extends DoubleSupplier, BooleanSupplier, Supplier<Double> {
 
-  double CONFIDENCE_THRESHOLD = 0.5;
+  double DEFAULT_CONFIDENCE_THRESHOLD = 0.5;
 
   static JaccardFactory jaccard() {
     return new JaccardFactory();
@@ -106,7 +105,7 @@ public interface Similarity<T>
 
   @Override
   default boolean getAsBoolean() {
-    return getAsDouble() >= CONFIDENCE_THRESHOLD;
+    return getAsDouble() >= DEFAULT_CONFIDENCE_THRESHOLD;
   }
 
   @Override

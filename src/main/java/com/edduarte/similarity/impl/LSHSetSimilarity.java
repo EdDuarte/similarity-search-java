@@ -36,9 +36,9 @@ public class LSHSetSimilarity extends SetSimilarity {
 
   protected final JaccardSetSimilarity jaccard;
 
-  protected final Set2SignatureConverter sigp;
+  protected final Set2SignatureConverter sigConverter;
 
-  protected final Signature2BandsConverter bandp;
+  protected final Signature2BandsConverter bandConverter;
 
   protected final ExecutorService exec;
 
@@ -46,15 +46,13 @@ public class LSHSetSimilarity extends SetSimilarity {
   /**
    * Instantiates a Similarity class for number sets using the LSH algorithm.
    *
-   * @param exec the executor that will receive the concurrent signature and
-   *             band processing tasks
-   * @param n    the total number of unique elements in both sets
-   * @param b    the number of bands
-   * @param r    the number of rows
-   * @param s    the threshold (value between 0.0 and 1.0) that balances the
-   *             trade-off between the number of false positives and false
-   *             negatives. A sensible threshold is 0.5, so we have a equal
-   *             number of false positives and false negatives.
+   * @param exec the executor that will receive the concurrent signature and band processing tasks
+   * @param n the total number of unique elements in both sets
+   * @param b the number of bands
+   * @param r the number of rows
+   * @param s the threshold (value between 0.0 and 1.0) that balances the trade-off between the
+   * number of false positives and false negatives. A sensible threshold is 0.5, so we have a equal
+   * number of false positives and false negatives.
    */
   public LSHSetSimilarity(
       Collection<? extends Number> c1,
@@ -70,8 +68,8 @@ public class LSHSetSimilarity extends SetSimilarity {
     int R = (int) Math.ceil(Math.log(1.0 / b) / Math.log(s)) + 1;
     int sigSize = R * b;
     this.jaccard = new JaccardSetSimilarity(c1, c2);
-    this.sigp = new Set2SignatureConverter(n, sigSize);
-    this.bandp = new Signature2BandsConverter(b, r);
+    this.sigConverter = new Set2SignatureConverter(n, sigSize);
+    this.bandConverter = new Signature2BandsConverter(b, r);
     this.exec = exec;
   }
 
@@ -88,15 +86,15 @@ public class LSHSetSimilarity extends SetSimilarity {
       Collection<? extends Number> c1,
       Collection<? extends Number> c2) {
     try {
-      Future<int[]> signatureFuture1 = exec.submit(sigp.apply(c1));
-      Future<int[]> signatureFuture2 = exec.submit(sigp.apply(c2));
+      Future<int[]> signatureFuture1 = exec.submit(sigConverter.apply(c1));
+      Future<int[]> signatureFuture2 = exec.submit(sigConverter.apply(c2));
       int[] signature1 = signatureFuture1.get();
       int[] signature2 = signatureFuture2.get();
       signatureFuture1 = null;
       signatureFuture2 = null;
 
-      Future<int[]> bandsFuture1 = exec.submit(bandp.apply(signature1));
-      Future<int[]> bandsFuture2 = exec.submit(bandp.apply(signature2));
+      Future<int[]> bandsFuture1 = exec.submit(bandConverter.apply(signature1));
+      Future<int[]> bandsFuture2 = exec.submit(bandConverter.apply(signature2));
       int[] bands1 = bandsFuture1.get();
       int[] bands2 = bandsFuture2.get();
       bandsFuture1 = null;

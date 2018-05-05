@@ -41,9 +41,8 @@ public class JaccardStringSimilarity extends StringSimilarity {
   /**
    * Instantiates a Similarity class for strings using the Jaccard algorithm.
    *
-   * @param k    the length k of the shingles to generate
-   * @param exec the executor that will receive the concurrent shingle
-   *             processing tasks
+   * @param k the length k of the shingles to generate
+   * @param exec the executor that will receive the concurrent shingle processing tasks
    */
   public JaccardStringSimilarity(
       String s1,

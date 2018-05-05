@@ -61,10 +61,7 @@ public final class KShingles2SignatureConverter
     private final int sigSize;
 
 
-    private SignatureCallable(
-        List<CharSequence> shingles,
-        HashMethod hash,
-        int sigSize) {
+    private SignatureCallable(List<CharSequence> shingles, HashMethod hash, int sigSize) {
       this.shingles = shingles;
       this.hash = hash;
       this.sigSize = sigSize;

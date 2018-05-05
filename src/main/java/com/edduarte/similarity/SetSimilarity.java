@@ -8,17 +8,14 @@ import java.util.Objects;
  * @version 0.0.1
  * @since 0.0.1
  */
-public abstract class SetSimilarity
-    implements Similarity<Collection<? extends Number>> {
+public abstract class SetSimilarity implements Similarity<Collection<? extends Number>> {
 
   private final Collection<? extends Number> c1;
 
   private final Collection<? extends Number> c2;
 
 
-  protected SetSimilarity(
-      Collection<? extends Number> c1,
-      Collection<? extends Number> c2) {
+  protected SetSimilarity(Collection<? extends Number> c1, Collection<? extends Number> c2) {
     Objects.requireNonNull(c1, "Sets to compare must not be null");
     Objects.requireNonNull(c2, "Sets to compare must not be null");
     this.c1 = c1;

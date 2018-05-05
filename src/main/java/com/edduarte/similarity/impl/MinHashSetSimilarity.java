@@ -39,12 +39,10 @@ public class MinHashSetSimilarity extends SetSimilarity {
 
 
   /**
-   * Instantiates a Similarity class for number sets using the MinHashing
-   * algorithm.
+   * Instantiates a Similarity class for number sets using the MinHashing algorithm.
    *
-   * @param exec    the executor that will receive the concurrent shingle
-   *                processing tasks
-   * @param n       the total number of unique elements in both sets
+   * @param exec the executor that will receive the concurrent shingle processing tasks
+   * @param n the total number of unique elements in both sets
    * @param sigSize the length of the signature array to be generated
    */
   public MinHashSetSimilarity(

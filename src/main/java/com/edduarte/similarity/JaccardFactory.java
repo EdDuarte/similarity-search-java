@@ -25,8 +25,7 @@ public final class JaccardFactory extends Factory {
 
 
   /**
-   * Length of n-gram shingles that are used for comparison (used for
-   * strings only).
+   * Length of n-gram shingles that are used for comparison (used for strings only).
    */
   public synchronized JaccardFactory withShingleLength(int shingleLength) {
     this.k = shingleLength;
@@ -35,8 +34,8 @@ public final class JaccardFactory extends Factory {
 
 
   /**
-   * An executor where the kshingling tasks are spawned. If nothing is
-   * provided then it launches a new executor with the cached thread pool.
+   * An executor where the kshingling tasks are spawned. If nothing is provided then it launches a
+   * new executor with the cached thread pool.
    */
   public synchronized JaccardFactory withExecutor(ExecutorService executor) {
     setExec(executor);

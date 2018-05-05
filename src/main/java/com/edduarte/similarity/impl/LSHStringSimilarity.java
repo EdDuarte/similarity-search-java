@@ -36,9 +36,9 @@ public class LSHStringSimilarity extends StringSimilarity {
 
   protected final JaccardStringSimilarity jaccard;
 
-  protected final KShingles2SignatureConverter sigp;
+  protected final KShingles2SignatureConverter sigConverter;
 
-  protected final Signature2BandsConverter bandp;
+  protected final Signature2BandsConverter bandConverter;
 
   protected final ExecutorService exec;
 
@@ -46,16 +46,14 @@ public class LSHStringSimilarity extends StringSimilarity {
   /**
    * Instantiates a Similarity class for strings using the LSH algorithm.
    *
-   * @param k    the length k of the shingles to generate
-   * @param b    the number of bands
-   * @param r    the number of rows
-   * @param s    the threshold (value between 0.0 and 1.0) that balances the
-   *             trade-off between the number of false positives and false
-   *             negatives. A sensible threshold is 0.5, so we have a equal
-   *             number of false positives and false negatives.
+   * @param k the length k of the shingles to generate
+   * @param b the number of bands
+   * @param r the number of rows
+   * @param s the threshold (value between 0.0 and 1.0) that balances the trade-off between the
+   * number of false positives and false negatives. A sensible threshold is 0.5, so we have a equal
+   * number of false positives and false negatives.
    * @param hash the hash method to use when hashing shingles to signatures
-   * @param exec the executor that will receive the concurrent signature and
-   *             band processing tasks
+   * @param exec the executor that will receive the concurrent signature and band processing tasks
    */
   public LSHStringSimilarity(
       String s1,
@@ -74,8 +72,8 @@ public class LSHStringSimilarity extends StringSimilarity {
     int signatureSize = R * b;
 
     this.jaccard = new JaccardStringSimilarity(s1, s2, k, exec);
-    this.sigp = new KShingles2SignatureConverter(hash, signatureSize);
-    this.bandp = new Signature2BandsConverter(b, r);
+    this.sigConverter = new KShingles2SignatureConverter(hash, signatureSize);
+    this.bandConverter = new Signature2BandsConverter(b, r);
     this.exec = exec;
   }
 
@@ -91,17 +89,15 @@ public class LSHStringSimilarity extends StringSimilarity {
   public boolean isCandidatePair(String s1, String s2) {
     JaccardStringSimilarity.ShinglePair pair = jaccard.getShingles(s1, s2);
     try {
-      Future<int[]> signatureFuture1 =
-          exec.submit(sigp.apply(pair.getShingles1()));
-      Future<int[]> signatureFuture2 =
-          exec.submit(sigp.apply(pair.getShingles2()));
+      Future<int[]> signatureFuture1 = exec.submit(sigConverter.apply(pair.getShingles1()));
+      Future<int[]> signatureFuture2 = exec.submit(sigConverter.apply(pair.getShingles2()));
       int[] signature1 = signatureFuture1.get();
       int[] signature2 = signatureFuture2.get();
       signatureFuture1 = null;
       signatureFuture2 = null;
 
-      Future<int[]> bandsFuture1 = exec.submit(bandp.apply(signature1));
-      Future<int[]> bandsFuture2 = exec.submit(bandp.apply(signature2));
+      Future<int[]> bandsFuture1 = exec.submit(bandConverter.apply(signature1));
+      Future<int[]> bandsFuture2 = exec.submit(bandConverter.apply(signature2));
       int[] bands1 = bandsFuture1.get();
       int[] bands2 = bandsFuture2.get();
       bandsFuture1 = null;

@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
  * @version 0.0.1
  * @since 0.0.1
  */
-public final class Signature2BandsConverter
-    implements Function<int[], Callable<int[]>> {
+public final class Signature2BandsConverter implements Function<int[], Callable<int[]>> {
 
   private final int b;
 
@@ -46,9 +45,7 @@ public final class Signature2BandsConverter
 
   @Override
   public Callable<int[]> apply(int[] sig) {
-    List<Integer> sigList = Arrays.stream(sig)
-        .boxed()
-        .collect(Collectors.toList());
+    List<Integer> sigList = Arrays.stream(sig).boxed().collect(Collectors.toList());
     return new BandsCallable(sigList, b, r);
   }
 

@@ -16,6 +16,7 @@
 
 package com.edduarte.similarity.converter;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,22 +48,20 @@ public final class Set2SignatureConverter
 
 
   /**
-   * Expected maximum size of the sets to test. This
-   * will be the size of the hash signatures.
+   * Expected maximum size of the sets to test. This will be the size of the hash signatures.
    */
   private final int n;
 
 
   /**
-   * Size of min hashes that will be stored and compared to find the
-   * similarity index
+   * Size of min hashes that will be stored and compared to find the similarity index
    */
   private final int sigSize;
 
 
   /**
-   * Initializes hashing functions to compute MinHash signatures for sets that
-   * could have a maximum count calculate 'n' elements with a given signature size.
+   * Initializes hashing functions to compute MinHash signatures for sets that could have a maximum
+   * count calculate 'n' elements with a given signature size.
    */
   public Set2SignatureConverter(int n, int sigSize) {
     this.n = n;
@@ -79,13 +78,15 @@ public final class Set2SignatureConverter
 
   @Override
   public Callable<int[]> apply(Collection<? extends Number> c) {
-    List<? extends Number> list;
-    if (c instanceof List) {
-      list = (List) c;
-    } else {
-      list = new ArrayList<>(c);
+    List<BigDecimal> list = new ArrayList<>();
+    for (Number number : c) {
+      if (number instanceof Double) {
+        list.add(BigDecimal.valueOf(number.doubleValue()));
+      } else {
+        list.add(BigDecimal.valueOf(number.longValue()));
+      }
     }
-    list.sort(Comparator.comparingLong(Number::longValue));
+    list.sort(Comparator.naturalOrder());
     return new HashCallable(n, sigSize, a, b, list);
   }
 

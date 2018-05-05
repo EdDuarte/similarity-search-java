@@ -43,14 +43,12 @@ public class MinHashStringSimilarity extends StringSimilarity {
 
 
   /**
-   * Instantiates a Similarity class for strings using the MinHashing
-   * algorithm.
+   * Instantiates a Similarity class for strings using the MinHashing algorithm.
    *
-   * @param k       the length k of the shingles to generate
+   * @param k the length k of the shingles to generate
    * @param sigSize the length of the signature array to be generated
-   * @param hash    the hash method to use when hashing shingles to signatures
-   * @param exec    the executor that will receive the concurrent shingle
-   *                processing tasks
+   * @param hash the hash method to use when hashing shingles to signatures
+   * @param exec the executor that will receive the concurrent shingle processing tasks
    */
   public MinHashStringSimilarity(
       String s1,
@@ -78,9 +76,7 @@ public class MinHashStringSimilarity extends StringSimilarity {
   }
 
 
-  protected int[][] getSignatures(
-      List<CharSequence> shingles1,
-      List<CharSequence> shingles2) {
+  protected int[][] getSignatures(List<CharSequence> shingles1, List<CharSequence> shingles2) {
     Future<int[]> signatureFuture1 = exec.submit(p.apply(shingles1));
     Future<int[]> signatureFuture2 = exec.submit(p.apply(shingles2));
 

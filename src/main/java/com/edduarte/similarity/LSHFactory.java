@@ -37,14 +37,13 @@ public final class LSHFactory extends Factory {
     this.n = -1;
     this.b = 20;
     this.r = 5;
-    this.s = 0.5;
+    this.s = Similarity.DEFAULT_CONFIDENCE_THRESHOLD;
     this.h = HashProvider.HashMethod.Murmur3;
   }
 
 
   /**
-   * Length of n-gram shingles that are used when generating signatures
-   * (used for strings only).
+   * Length of n-gram shingles that are used when generating signatures (used for strings only).
    */
   public synchronized LSHFactory withShingleLength(int shingleLength) {
     this.k = shingleLength;
@@ -53,10 +52,9 @@ public final class LSHFactory extends Factory {
 
 
   /**
-   * Number of unique elements in both sets (used for sets only). For
-   * example, if set1=[4, 5, 6, 7, 8] and set2=[7, 8, 9, 10], this value
-   * should be 7. If nothing is provided, this value is determined in
-   * pre-processing.
+   * Number of unique elements in both sets (used for sets only). For example, if set1=[4, 5, 6, 7,
+   * 8] and set2=[7, 8, 9, 10], this value should be 7. If nothing is provided, this value is
+   * determined in pre-processing.
    */
   public synchronized LSHFactory withNumberOfElements(int elementCount) {
     this.n = elementCount;
@@ -83,8 +81,7 @@ public final class LSHFactory extends Factory {
 
 
   /**
-   * A threshold S that balances the number of false positives and false
-   * negatives.
+   * A threshold S that balances the number of false positives and false negatives.
    */
   public synchronized LSHFactory withThreshold(double threshold) {
     this.s = threshold;
@@ -93,8 +90,7 @@ public final class LSHFactory extends Factory {
 
 
   /**
-   * The hashing algorithm used to hash shingles to signatures (used for
-   * strings only).
+   * The hashing algorithm used to hash shingles to signatures (used for strings only).
    */
   public synchronized LSHFactory withHashMethod(HashProvider.HashMethod hashMethod) {
     this.h = hashMethod;
@@ -103,9 +99,8 @@ public final class LSHFactory extends Factory {
 
 
   /**
-   * An executor where the kshingling and signature processing tasks are
-   * spawned. If nothing is provided then it launches a new executor with
-   * the cached thread pool.
+   * An executor where the kshingling and signature processing tasks are spawned. If nothing is
+   * provided then it launches a new executor with the cached thread pool.
    */
   public synchronized LSHFactory withExecutor(ExecutorService executor) {
     setExec(executor);
