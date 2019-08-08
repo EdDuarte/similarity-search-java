@@ -18,7 +18,7 @@ package com.edduarte.similarity.impl;
 
 import com.edduarte.similarity.SetSimilarity;
 import com.edduarte.similarity.Similarity;
-import com.edduarte.similarity.converter.Set2SignatureConverter;
+import com.edduarte.similarity.converter.SetToSignatureConverter;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
  */
 public class MinHashSetSimilarity extends SetSimilarity {
 
-  protected final Set2SignatureConverter p;
+  protected final SetToSignatureConverter p;
 
   protected final ExecutorService exec;
 
@@ -53,7 +53,7 @@ public class MinHashSetSimilarity extends SetSimilarity {
       ExecutorService exec) {
     super(c1, c2);
     Objects.requireNonNull(exec, "Executor must not be null");
-    this.p = new Set2SignatureConverter(n, sigSize);
+    this.p = new SetToSignatureConverter(n, sigSize);
     this.exec = exec;
   }
 

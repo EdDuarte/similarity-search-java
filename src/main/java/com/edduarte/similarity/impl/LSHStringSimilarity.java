@@ -18,8 +18,8 @@ package com.edduarte.similarity.impl;
 
 import com.edduarte.similarity.Similarity;
 import com.edduarte.similarity.StringSimilarity;
-import com.edduarte.similarity.converter.KShingles2SignatureConverter;
-import com.edduarte.similarity.converter.Signature2BandsConverter;
+import com.edduarte.similarity.converter.KShinglesToSignatureConverter;
+import com.edduarte.similarity.converter.SignatureToBandsConverter;
 import orestes.bloomfilter.HashProvider.HashMethod;
 
 import java.util.Objects;
@@ -36,9 +36,11 @@ public class LSHStringSimilarity extends StringSimilarity {
 
   protected final JaccardStringSimilarity jaccard;
 
-  protected final KShingles2SignatureConverter sigConverter;
+  protected final KShinglesToSignatureConverter sigConverter;
 
-  protected final Signature2BandsConverter bandConverter;
+  protected final SignatureToBandsConverter bandConverter;
+
+  protected final double confidenceThreshold;
 
   protected final ExecutorService exec;
 
@@ -68,12 +70,13 @@ public class LSHStringSimilarity extends StringSimilarity {
     Objects.requireNonNull(hash, "Hash method must not be null");
     Objects.requireNonNull(exec, "Executor must not be null");
     // signature size is determined by a threshold S
+    this.confidenceThreshold = s;
     int R = (int) Math.ceil(Math.log(1.0 / b) / Math.log(s)) + 1;
     int signatureSize = R * b;
 
     this.jaccard = new JaccardStringSimilarity(s1, s2, k, exec);
-    this.sigConverter = new KShingles2SignatureConverter(hash, signatureSize);
-    this.bandConverter = new Signature2BandsConverter(b, r);
+    this.sigConverter = new KShinglesToSignatureConverter(hash, signatureSize);
+    this.bandConverter = new SignatureToBandsConverter(b, r);
     this.exec = exec;
   }
 
@@ -85,6 +88,10 @@ public class LSHStringSimilarity extends StringSimilarity {
     return isCandidatePair(s1, s2) ? jaccard.getAsDouble() : 0;
   }
 
+  @Override
+  public boolean getAsBoolean() {
+    return getAsDouble() >= confidenceThreshold;
+  }
 
   public boolean isCandidatePair(String s1, String s2) {
     JaccardStringSimilarity.ShinglePair pair = jaccard.getShingles(s1, s2);

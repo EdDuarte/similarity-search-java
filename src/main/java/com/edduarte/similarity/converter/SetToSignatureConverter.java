@@ -32,7 +32,7 @@ import java.util.function.Function;
  * @version 0.0.1
  * @since 0.0.1
  */
-public final class Set2SignatureConverter
+public final class SetToSignatureConverter
     implements Function<Collection<? extends Number>, Callable<int[]>> {
 
   /**
@@ -63,7 +63,7 @@ public final class Set2SignatureConverter
    * Initializes hashing functions to compute MinHash signatures for sets that could have a maximum
    * count calculate 'n' elements with a given signature size.
    */
-  public Set2SignatureConverter(int n, int sigSize) {
+  public SetToSignatureConverter(int n, int sigSize) {
     this.n = n;
     this.sigSize = sigSize;
     SecureRandom r = new SecureRandom();

@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
  * @version 0.0.1
  * @since 0.0.1
  */
-public final class Signature2BandsConverter implements Function<int[], Callable<int[]>> {
+public final class SignatureToBandsConverter implements Function<int[], Callable<int[]>> {
 
   private final int b;
 
   private final int r;
 
 
-  public Signature2BandsConverter(int b, int r) {
+  public SignatureToBandsConverter(int b, int r) {
     this.b = b;
     this.r = r;
   }

@@ -18,9 +18,10 @@ package com.edduarte.similarity.impl;
 
 import com.edduarte.similarity.SetSimilarity;
 import com.edduarte.similarity.Similarity;
-import com.edduarte.similarity.converter.Set2SignatureConverter;
-import com.edduarte.similarity.converter.Signature2BandsConverter;
+import com.edduarte.similarity.converter.SetToSignatureConverter;
+import com.edduarte.similarity.converter.SignatureToBandsConverter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -36,9 +37,9 @@ public class LSHSetSimilarity extends SetSimilarity {
 
   protected final JaccardSetSimilarity jaccard;
 
-  protected final Set2SignatureConverter sigConverter;
+  protected final SetToSignatureConverter sigConverter;
 
-  protected final Signature2BandsConverter bandConverter;
+  protected final SignatureToBandsConverter bandConverter;
 
   protected final ExecutorService exec;
 
@@ -68,8 +69,8 @@ public class LSHSetSimilarity extends SetSimilarity {
     int R = (int) Math.ceil(Math.log(1.0 / b) / Math.log(s)) + 1;
     int sigSize = R * b;
     this.jaccard = new JaccardSetSimilarity(c1, c2);
-    this.sigConverter = new Set2SignatureConverter(n, sigSize);
-    this.bandConverter = new Signature2BandsConverter(b, r);
+    this.sigConverter = new SetToSignatureConverter(n, sigSize);
+    this.bandConverter = new SignatureToBandsConverter(b, r);
     this.exec = exec;
   }
 

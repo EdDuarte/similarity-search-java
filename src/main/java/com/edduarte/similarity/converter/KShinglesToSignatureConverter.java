@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * @version 0.0.1
  * @since 0.0.1
  */
-public final class KShingles2SignatureConverter
+public final class KShinglesToSignatureConverter
     implements Function<List<CharSequence>, Callable<int[]>> {
 
   private final HashMethod hash;
@@ -40,7 +40,7 @@ public final class KShingles2SignatureConverter
   private final int sigSize;
 
 
-  public KShingles2SignatureConverter(HashMethod hash, int sigSize) {
+  public KShinglesToSignatureConverter(HashMethod hash, int sigSize) {
     this.hash = hash;
     this.sigSize = sigSize;
   }

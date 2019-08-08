@@ -19,7 +19,7 @@ package com.edduarte.similarity.impl;
 
 import com.edduarte.similarity.Similarity;
 import com.edduarte.similarity.StringSimilarity;
-import com.edduarte.similarity.converter.KShingles2SignatureConverter;
+import com.edduarte.similarity.converter.KShinglesToSignatureConverter;
 import orestes.bloomfilter.HashProvider.HashMethod;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class MinHashStringSimilarity extends StringSimilarity {
 
   protected final JaccardStringSimilarity jaccard;
 
-  protected final KShingles2SignatureConverter p;
+  protected final KShinglesToSignatureConverter p;
 
 
   /**
@@ -61,7 +61,7 @@ public class MinHashStringSimilarity extends StringSimilarity {
     Objects.requireNonNull(hash, "Hash method must not be null");
     Objects.requireNonNull(exec, "Executor must not be null");
     this.jaccard = new JaccardStringSimilarity(s1, s2, k, exec);
-    this.p = new KShingles2SignatureConverter(hash, sigSize);
+    this.p = new KShinglesToSignatureConverter(hash, sigSize);
     this.exec = exec;
   }
 
