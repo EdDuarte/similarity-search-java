@@ -1,13 +1,20 @@
-#intellij
-.idea
-settings.xml
+
+# IntelliJ
+*.iml
+/.idea
+out/
+/local.properties
+
+# Gradle
+.gradle
+build
+/reports
 
 tomcat.*
 
 target
 logs
 
-*.iml
 *.ipr
 *.iws
 *.log
@@ -15,8 +22,7 @@ logs
 .project
 .settings
 
-
-#netbeans
+# Netbeans
 nbactions.xml
 
 # osx noise
