@@ -24,8 +24,8 @@ publishing {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/edduarte/similarity-search-java")
       credentials {
-        username = project.findProperty("gpr.user") ?: System.getenv("username")
-        password = project.findProperty("gpr.key") ?: System.getenv("token")
+        username = project.findProperty("username") ?: System.getenv("username")
+        password = project.findProperty("token") ?: System.getenv("token")
       }
     }
   }
