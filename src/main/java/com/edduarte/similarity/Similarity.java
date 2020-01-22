@@ -33,12 +33,13 @@ public interface Similarity<T> extends DoubleSupplier, BooleanSupplier, Supplier
     return (double) intersectionCount / (double) unionCount;
   }
 
-  static double jaccardIndex(
+  static double jaccardIndexFromShingles(
       List<CharSequence> shingles1,
       List<CharSequence> shingles2) {
-    ArrayList<Integer> r1 = shinglesToR(shingles1);
-    ArrayList<Integer> r2 = shinglesToR(shingles2);
+    return jaccardIndexFromR(shinglesToR(shingles1), shinglesToR(shingles2));
+  }
 
+  static double jaccardIndexFromR(List<Integer> r1, List<Integer> r2) {
     int maxLength = Math.max(r1.size(), r2.size());
 
     int intersection = 0;

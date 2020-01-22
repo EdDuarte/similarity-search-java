@@ -61,7 +61,7 @@ public class JaccardStringSimilarity extends StringSimilarity {
     String s1 = getFirst();
     String s2 = getSecond();
     ShinglePair shingles = getShingles(s1, s2);
-    return Similarity.jaccardIndex(
+    return Similarity.jaccardIndexFromShingles(
         shingles.getShingles1(),
         shingles.getShingles2()
     );
