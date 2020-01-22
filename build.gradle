@@ -1,5 +1,6 @@
 plugins {
-  id 'java'
+  id('java')
+  id("maven-publish")
 }
 
 group 'com.edduarte'
@@ -13,6 +14,24 @@ repositories {
 }
 
 dependencies {
-  testCompile group: 'junit', name: 'junit', version: '4.12'
+  testCompile('junit:junit:4.12')
   compile('com.baqend:bloom-filter:2.2.2')
+}
+
+publishing {
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/edduarte/similarity-search-java")
+      credentials {
+        username = project.findProperty("gpr.user")
+        password = project.findProperty("gpr.key")
+      }
+    }
+  }
+  publications {
+    gpr(MavenPublication) {
+      from(components.java)
+    }
+  }
 }
