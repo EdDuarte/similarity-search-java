@@ -16,4 +16,4 @@ jobs:
     - name: Build
       run: ./gradlew build
     - name: Publish
-      run: ./gradlew publish -Pusername=edduarte -Ptoken={{ secrets.GITHUB_TOKEN }}
+      run: ./gradlew publish -Pusername=edduarte -Ptoken=${{ secrets.GITHUB_TOKEN }}
