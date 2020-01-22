@@ -1,13 +1,6 @@
 name: Java CI Build
 
-on:
-  # Trigger the workflow on push or pull request for dev branches
-  push:
-    branches:
-      - !master
-  pull_request:
-    branches:
-      - !master
+on: push
 
 jobs:
   build:
