@@ -1,13 +1,10 @@
-name: Java CI Build & Deploy
+name: Java CI Deploy
 
 on:
-  # Trigger the workflow on push or pull request for the master branch
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  # Trigger the workflow when a release is published
+  release:
+    types:
+      - published
 
 jobs:
   build:
@@ -20,7 +17,5 @@ jobs:
         java-version: 1.8
     - name: Give executable permission to Gradle wrapper file
       run: chmod +x gradlew
-    - name: Build
-      run: ./gradlew build
     - name: Publish
       run: ./gradlew publish -Pusername=edduarte -Ptoken=${{ secrets.GITHUB_TOKEN }}
