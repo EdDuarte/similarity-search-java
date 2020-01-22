@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.edduarte'
-version '0.0.1'
+version '0.0.3'
 
 sourceCompatibility = 1.8
 
@@ -24,8 +24,8 @@ publishing {
       name = "GitHubPackages"
       url = uri("https://maven.pkg.github.com/edduarte/similarity-search-java")
       credentials {
-        username = project.findProperty("gpr.user")
-        password = project.findProperty("gpr.key")
+        username = project.findProperty("gpr.user") ?: System.getenv("username")
+        password = project.findProperty("gpr.key") ?: System.getenv("token")
       }
     }
   }
