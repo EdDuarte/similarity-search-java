@@ -1,6 +1,6 @@
 # Similarity Search algorithms in Java
 
-[![Build Status](https://travis-ci.org/edduarte/similarity-search-java.svg?branch=master)](https://travis-ci.org/edduarte/similarity-search-java) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This library contains easy-to-use and high-performant nearest-neighbor-search
 algorithms (as specified in "Mining of Massive Datasets", Cambridge University
@@ -20,14 +20,14 @@ threads spawned by an ExecutorService).
 <dependency>
   <groupId>com.edduarte</groupId>
   <artifactId>similarity-search-java</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.5</version>
 </dependency>
 ```
 
 ### Gradle
 ```
 dependencies {
-  compile 'com.edduarte:similarity-search-java:0.0.1'
+  compile 'com.edduarte:similarity-search-java:0.0.5'
 }
 ```
 
